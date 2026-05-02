@@ -1,0 +1,24 @@
+{
+  "name": "vinyl-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ze-nien/VinylCollection.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/ze-nien/VinylCollection/issues"
+  },
+  "homepage": "https://github.com/ze-nien/VinylCollection#readme",
+  "dependencies": {
+    "zod": "^4.4.1"
+  }
+}

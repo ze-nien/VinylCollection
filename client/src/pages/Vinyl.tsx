@@ -1,4 +1,4 @@
-import VinylCard from "../components/VinylCard";
+import VinylCard from "../components/VinylCard.js";
 import { useVinyl } from "../hooks/useVinyl";
 
 const Vinyl = () => {

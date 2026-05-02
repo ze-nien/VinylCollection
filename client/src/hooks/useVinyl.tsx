@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import type { Vinyl } from "../types/vinyl";
 
 export const useVinyl = () => {
-  const [vinyls, setVinyls] = useState([]);
+  const [vinyls, setVinyls] = useState<Vinyl[]>([]);
 
   useEffect(() => {
     const fetchAllVinyls = async () => {
