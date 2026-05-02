@@ -3,6 +3,7 @@ import Layout from "./layouts/Layout";
 import Vinyl from "./pages/Vinyl";
 import Stats from "./pages/Stats";
 import WishList from "./pages/WishList";
+import VinylForm from "./components/VinylForm";
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
       {
         path: "wishlist",
         element: <WishList />,
+      },
+      {
+        path: "add",
+        element: <VinylForm />,
       },
     ],
   },

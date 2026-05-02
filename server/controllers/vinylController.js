@@ -3,7 +3,7 @@ import Vinyl from "../models/Vinyl.js";
 //所有資料GET('api/vinyls')
 export const getAllVinyls = async (req, res, next) => {
   try {
-    const vinyls = await Vinyl.find();
+    const vinyls = await Vinyl.find().sort({ createdAt: -1 });
     res.status(200).json(vinyls);
   } catch (e) {
     next(e);
