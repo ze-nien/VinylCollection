@@ -1,6 +1,7 @@
 import type { Vinyl } from "../types/vinyl.ts";
 
 const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
+  console.log(vinyl.genre);
   return (
     <div className="flex m-3">
       <ul>
