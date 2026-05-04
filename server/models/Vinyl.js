@@ -7,11 +7,11 @@ const VinylSchema = new mongoose.Schema(
     genre: [{ type: String, lowercase: true, trim: true }],
     coverUrl: String,
     year: String,
-    tracks: [{ id: Number, title: String, duration: String }],
+    tracks: [{ trackNo: Number, title: String, duration: String }],
     comment: String,
     rating: {
       albumRating: Number,
-      trackRatings: [{ trackId: Number, score: Number }],
+      trackRatings: [{ trackNo: Number, score: Number }],
     },
   },
   {

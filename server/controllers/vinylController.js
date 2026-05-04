@@ -13,14 +13,18 @@ export const getAllVinyls = async (req, res, next) => {
 //新增資料POST('api/vinyls')
 export const createVinyl = async (req, res, next) => {
   try {
-    const { album, artist, genre, rating, tracks } = req.body;
+    const { album, artist, genre, coverUrl, year, tracks, comment, rating } =
+      req.body;
     console.log(req.body);
     const newVinyl = await Vinyl.create({
       album,
       artist,
       genre,
-      rating,
+      coverUrl,
+      year,
       tracks,
+      comment,
+      rating,
     });
     res.status(200).json(newVinyl);
   } catch (e) {
@@ -35,7 +39,7 @@ export const getVinyl = async (req, res, next) => {
     const vinyl = await Vinyl.findById(id).exec();
     if (vinyl) {
       console.log(`search result: ${vinyl}`);
-      res.status(200).json(id);
+      res.status(200).json(vinyl);
     } else {
       {
         const error = new Error("找不到該黑膠唱片的 ID");

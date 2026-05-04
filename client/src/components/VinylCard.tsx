@@ -1,11 +1,15 @@
+import { Link } from "react-router";
 import type { Vinyl } from "../types/vinyl.ts";
+import { useVinylStore } from "../store/vinylStore.ts";
 
 const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
-  console.log(vinyl.genre);
+  const deleteVinyl = useVinylStore((s) => s.deleteVinyl);
   return (
     <div className="flex m-3">
       <ul>
-        <li>{vinyl._id}</li>
+        <li>
+          <Link to={`edit/${vinyl._id}`}>{vinyl._id}</Link>
+        </li>
         <li>{vinyl.album}</li>
         <li>{vinyl.artist}</li>
         <li>
@@ -19,6 +23,9 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
                 </span>
               ))
             : "未分類"}
+        </li>
+        <li>
+          <button onClick={() => deleteVinyl(vinyl._id)}>delete</button>
         </li>
       </ul>
     </div>

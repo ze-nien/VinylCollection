@@ -26,6 +26,10 @@ export const router = createBrowserRouter([
         path: "add",
         element: <VinylForm />,
       },
+      {
+        path: "edit/:id",
+        element: <VinylForm />,
+      },
     ],
   },
 ]);
