@@ -1,18 +1,17 @@
-import type { CheckBoxProps } from "../types/formField";
+import type { CheckBoxProps } from "../../types/formField";
 
 const CheckBox = ({ options, ...checkboxProps }: CheckBoxProps) => {
   return (
     <div className="flex flex-wrap gap-4 mt-2">
       {options?.map((opt) => {
-        const value = opt.trim().toLowerCase();
         return (
           <label
-            key={value}
+            key={opt}
             className="flex items-center gap-2 cursor-pointer group"
           >
             <input
               type="checkbox"
-              value={value}
+              value={opt}
               {...checkboxProps}
               className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
             />

@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import type { SubmitErrorHandler, SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 
@@ -8,17 +8,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useVinylStore } from "../store/vinylStore";
 
 import FormField from "./FormField";
-import TrackList from "./TrackList";
 import { useEffect } from "react";
+import StarRating from "./StarRating";
+
+import { GENRES } from "../../../shared/constants";
 
 const VinylForm = () => {
   const navigate = useNavigate();
   const addVinyl = useVinylStore((s) => s.addVinyl);
-  const fetchVinyl = useVinylStore((s) => s.fetchVinyl);
+  const updateVinyl = useVinylStore((s) => s.updateVinyl);
   const clearVinyl = useVinylStore((s) => s.clearVinyl);
+
+  const fetchVinyl = useVinylStore((s) => s.fetchVinyl);
   const vinyl = useVinylStore((s) => s.vinyl);
 
   const { id } = useParams<{ id: string }>();
+  const isEditMode = Boolean(id);
 
   const {
     register,
@@ -32,9 +37,9 @@ const VinylForm = () => {
       album: "",
       artist: "",
       year: undefined,
-      tracks: [], // 如果有 trackList，初始值設為空陣列
+      albumRating: 0,
     },
-    mode: "onChange", // 建議選用，這會讓使用者一輸錯就立刻看到 errors.message
+    mode: "onChange", //輸入錯立刻顯示errors.message
   });
 
   useEffect(() => {
@@ -43,24 +48,22 @@ const VinylForm = () => {
   }, [id, fetchVinyl, clearVinyl]);
 
   useEffect(() => {
-    if (vinyl) reset(vinyl);
+    if (vinyl) {
+      console.log(vinyl);
+      reset({
+        ...vinyl,
+        year: vinyl.year ? Number(vinyl.year) : undefined,
+        albumRating: vinyl.albumRating ? Number(vinyl.albumRating) : undefined,
+      });
+    }
   }, [vinyl, reset]);
 
-  const genreOptions = [
-    "Pop",
-    "Rock",
-    "Hip Hop/Rap",
-    "R&B/Soul",
-    "Jazz",
-    "Country",
-    "EDM",
-    "Indie/Alternative",
-    "Classical",
-    "Latin",
-  ];
-
-  const onSubmit: SubmitHandler<VinylBase> = (data) => {
-    addVinyl(data);
+  const onSubmit: SubmitHandler<VinylBase> = async (data) => {
+    if (isEditMode && id) {
+      await updateVinyl(id, data);
+    } else {
+      await addVinyl(data);
+    }
     navigate("/");
   };
 
@@ -91,7 +94,7 @@ const VinylForm = () => {
           id="genre"
           label="Genre"
           tag="checkbox"
-          options={genreOptions}
+          options={[...GENRES]}
           error={errors.genre?.message as string}
           {...register("genre")}
         />
@@ -120,21 +123,22 @@ const VinylForm = () => {
             },
           })}
         />
-        {errors.year?.message ? null : ( // 情況 A：有錯誤時，這裡其實可以留空，因為 VinylField 內部通常已經渲染了錯誤字串
-          // 情況 B：沒錯誤時，顯示格式提示字
-          <p className="text-[10px] text-gray-400 mt-1">
-            💡 若有填寫，請符合 1999 格式 (範圍 1800-2026)
-          </p>
-        )}
-
-        <TrackList control={control} register={register} errors={errors} />
-        {/* rating */}
+        <Controller
+          control={control}
+          name={`albumRating`}
+          render={({ field }) => (
+            <div className="flex items-center gap-2 mt-4">
+              <span>Album Rating:</span>
+              <StarRating value={field.value || 0} onChange={field.onChange} />
+            </div>
+          )}
+        />
         <FormField
-          id="comment"
-          label="Comment"
+          id="notes"
+          label="Notes"
           tag="textarea"
-          error={errors.comment?.message as string}
-          {...register("comment")}
+          error={errors.notes?.message as string}
+          {...register("notes")}
         />
         <button type="submit">submit</button>
       </form>

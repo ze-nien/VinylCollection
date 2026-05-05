@@ -11,10 +11,10 @@ const FieldWrapper = ({ label, error, id, children }: FieldWrapperProps) => {
       <div>
         <label htmlFor={id}>{label}: </label>
         {children}
+        {error && (
+          <span className="ml-3 text-xs text-red-500 font-medium">{error}</span>
+        )}
       </div>
-      {error && (
-        <span className="text-xs text-red-500 font-medium">{error}</span>
-      )}
     </div>
   );
 };

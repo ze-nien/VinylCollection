@@ -52,7 +52,7 @@ export const getVinyl = async (req, res, next) => {
   }
 };
 
-//編輯單一PUT('api/vinyls/:id')
+//編輯單一PATCH('api/vinyls/:id')
 export const editVinyl = async (req, res, next) => {
   try {
     const { id } = req.params;

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { create } from "zustand";
-import type { Vinyl } from "../types/vinyl";
+import type { Vinyl, VinylBase } from "../types/vinyl";
 
 interface VinylState {
   vinyls: Vinyl[];
@@ -9,8 +9,9 @@ interface VinylState {
   isLoading: boolean;
   fetchVinyls: () => Promise<void>;
   fetchVinyl: (id: string) => Promise<void>;
-  addVinyl: (newVinyl: Omit<Vinyl, "_id">) => Promise<void>;
-  deleteVinyl: (vinyl: string) => Promise<void>;
+  addVinyl: (newVinyl: VinylBase) => Promise<void>;
+  updateVinyl: (id: string, updatedVinyl: VinylBase) => Promise<void>;
+  deleteVinyl: (id: string) => Promise<void>;
   clearVinyl: () => void;
 }
 
@@ -73,11 +74,32 @@ export const useVinylStore = create<VinylState>((set) => ({
       }
     }
   },
-  deleteVinyl: async (Id) => {
+  updateVinyl: async (id, updatedVinyl) => {
+    set({ isLoading: true });
     try {
-      await axios.delete<Vinyl>(`http://localhost:3000/api/vinyls/${Id}`);
+      const res = await axios.patch<Vinyl>(
+        `http://localhost:3000/api/vinyls/${id}`,
+        updatedVinyl,
+      );
       set((state) => ({
-        vinyls: state.vinyls.filter((vinyl) => vinyl._id !== Id),
+        vinyls: state.vinyls.map((vinyl) =>
+          vinyl._id === id ? { ...vinyl, ...res.data } : vinyl,
+        ),
+        isLoading: false,
+      }));
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        const errorMessage =
+          e.response?.data?.message || e.message || "發生未知錯誤";
+        set({ isLoading: false, error: errorMessage });
+      }
+    }
+  },
+  deleteVinyl: async (id) => {
+    try {
+      await axios.delete<Vinyl>(`http://localhost:3000/api/vinyls/${id}`);
+      set((state) => ({
+        vinyls: state.vinyls.filter((vinyl) => vinyl._id !== id),
       }));
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {

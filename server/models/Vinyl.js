@@ -1,18 +1,15 @@
 import mongoose from "mongoose";
+import { GENRES } from "../../shared/constants.ts";
 
 const VinylSchema = new mongoose.Schema(
   {
     album: { type: String, required: true },
     artist: { type: String, required: true },
-    genre: [{ type: String, lowercase: true, trim: true }],
+    genre: [{ type: String, enum: GENRES }],
     coverUrl: String,
     year: String,
-    tracks: [{ trackNo: Number, title: String, duration: String }],
-    comment: String,
-    rating: {
-      albumRating: Number,
-      trackRatings: [{ trackNo: Number, score: Number }],
-    },
+    albumRating: Number,
+    notes: String,
   },
   {
     timestamps: true,

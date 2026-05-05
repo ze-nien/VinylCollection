@@ -4,10 +4,10 @@ import type {
   CheckBoxProps,
   FormFieldProps,
 } from "../types/formField";
-import CheckBox from "./CheckBox";
+import CheckBox from "./ui/CheckBox";
 import FieldWrapper from "./FieldWrapper";
 import Input from "./ui/Input";
-import TextArea from "./ui/textArea";
+import TextArea from "./ui/TextArea";
 
 const FormField = (props: FormFieldProps) => {
   const { id, label, error, tag = "input" } = props;
