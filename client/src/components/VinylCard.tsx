@@ -10,8 +10,17 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
         <li>
           <Link to={`edit/${vinyl._id}`}>{vinyl._id}</Link>
         </li>
-        <li>{vinyl.album}</li>
-        <li>{vinyl.artist}</li>
+        <li>Album: {vinyl.album}</li>
+        <li>Artist: {vinyl.artist}</li>
+        <li>
+          <div className="w-32 h-32">
+            <img
+              src={vinyl.coverUrl || ""}
+              alt=""
+              className="border border-primary rounded-sm p-1"
+            />
+          </div>
+        </li>
         <li>
           {vinyl.genre && vinyl.genre.length > 0
             ? vinyl.genre.map((g) => (

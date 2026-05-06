@@ -5,14 +5,14 @@ import SideBar from "./SideBar";
 
 const Layout = () => {
   return (
-    <>
+    <div className="bg-secondary text-white flex flex-col min-h-svh">
       <NavBar />
-      <div className="flex">
+      <main className="flex-1 flex flex-row items-top p-2">
         <SideBar />
         <Outlet />
-      </div>
+      </main>
       <Footer />
-    </>
+    </div>
   );
 };
 

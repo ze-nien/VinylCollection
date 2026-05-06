@@ -1,13 +1,13 @@
-import type { CheckBoxProps } from "../../types/formField";
+import type { CheckBoxElementProps } from "../../types/formField";
 
-const CheckBox = ({ options, ...checkboxProps }: CheckBoxProps) => {
+const CheckBox = ({ options, ...checkboxProps }: CheckBoxElementProps) => {
   return (
-    <div className="flex flex-wrap gap-4 mt-2">
+    <div className="grid grid-cols-5 grid-rows-4 gap-1 mt-1">
       {options?.map((opt) => {
         return (
           <label
             key={opt}
-            className="flex items-center gap-2 cursor-pointer group"
+            className="flex items-center space-x-2 cursor-pointer"
           >
             <input
               type="checkbox"

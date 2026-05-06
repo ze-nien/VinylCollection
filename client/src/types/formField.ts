@@ -1,25 +1,27 @@
+import type { ComponentPropsWithRef } from "react";
+
+export type InputElementProps = ComponentPropsWithRef<"input">;
+export type TextAreaElementProps = ComponentPropsWithRef<"textarea">;
+export type CheckBoxElementProps = {
+  options?: string[];
+} & Omit<ComponentPropsWithRef<"input">, "type">;
+
 export interface BaseProps {
-  label?: string;
+  label: string;
   error?: string;
   id: string;
 }
-
-export type InputProps = BaseProps & {
-  tag?: "input";
-  type?: "number" | "text";
-  name?: string;
-  ref?: React.Ref<HTMLInputElement>;
-} & React.InputHTMLAttributes<HTMLInputElement>;
-
-export type TextareaProps = BaseProps & {
-  tag?: "textarea";
-  ref?: React.Ref<HTMLTextAreaElement>;
-} & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
-
-export type CheckBoxProps = BaseProps & {
-  tag?: "checkbox";
+export type FormFieldInputProps = BaseProps & {
+  tag: "input";
+} & ComponentPropsWithRef<"input">;
+export type FormFieldTextareaProps = BaseProps & {
+  tag: "textarea";
+} & ComponentPropsWithRef<"textarea">;
+export type FormFieldCheckBoxProps = BaseProps & {
+  tag: "checkbox";
   options?: string[];
-  ref?: React.Ref<HTMLInputElement>;
-} & React.InputHTMLAttributes<HTMLInputElement>;
-
-export type FormFieldProps = InputProps | TextareaProps | CheckBoxProps;
+} & Omit<ComponentPropsWithRef<"input">, "type">;
+export type FormFieldProps =
+  | FormFieldInputProps
+  | FormFieldTextareaProps
+  | FormFieldCheckBoxProps;

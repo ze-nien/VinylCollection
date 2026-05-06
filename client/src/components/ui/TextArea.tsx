@@ -1,9 +1,9 @@
-import type { TextareaProps } from "../../types/formField";
+import type { TextAreaElementProps } from "../../types/formField";
 
-const TextArea = ({ ref, ...textAreaProps }: TextareaProps) => {
+const TextArea = ({ ...textAreaProps }: TextAreaElementProps) => {
   return (
     <div>
-      <textarea ref={ref} {...textAreaProps} className="border p-1 rounded" />
+      <textarea {...textAreaProps} className="w-full border p-1 rounded" />
     </div>
   );
 };

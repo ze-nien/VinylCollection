@@ -1,61 +1,15 @@
 @import "tailwindcss";
-
 @theme {
-  --color-vinyl-gold: #c9a34a;
-  --color-vinyl-gold-2: #e0bc68;
-  --color-vinyl-bg-2: #111111;
-  --vinyl-hole: 22px;
+  /* 設定主題色 */
+  --color-primary: #f4ac45;
+  --color-secondary: #001514;
+
+  /* 設定字體 */
+  --font-main: "Oswald", "Noto Sans TC", sans-serif;
 }
 
-@utility vinyl-disc {
-  @apply relative shrink-0 rounded-full;
-  background: conic-gradient(
-    #1a1614 0deg,
-    #2a2420 15deg,
-    #1a1614 30deg,
-    #252220 45deg,
-    #1a1614 60deg,
-    #2a2420 75deg,
-    #1a1614 90deg,
-    #252220 105deg,
-    #1a1614 120deg,
-    #2a2420 135deg,
-    #1a1614 150deg,
-    #252220 165deg,
-    #1a1614 180deg,
-    #2a2420 195deg,
-    #1a1614 210deg,
-    #252220 225deg,
-    #1a1614 240deg,
-    #2a2420 255deg,
-    #1a1614 270deg,
-    #252220 285deg,
-    #1a1614 300deg,
-    #2a2420 315deg,
-    #1a1614 330deg,
-    #252220 345deg,
-    #1a1614 360deg
-  );
-  animation: spin 8s linear infinite paused;
-}
-
-.vinyl-disc::after {
-  content: "";
-  position: absolute;
-  inset: var(--vinyl-hole);
-  border-radius: 9999px;
-  background: var(--color-vinyl-gold);
-  box-shadow:
-    0 0 0 2px var(--color-vinyl-bg-2),
-    0 0 0 3px var(--color-vinyl-gold-2);
-}
-
-.vinyl-disc.spinning {
-  animation-play-state: running;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+/* 應用全域字體 */
+:root {
+  font-family: var(--font-main);
+  font-size: large;
 }
