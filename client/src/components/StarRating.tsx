@@ -1,6 +1,6 @@
 interface StarRatingProps {
   value: number;
-  onChange?: (val: number) => void; // 如果提供 onChange 則為編輯模式
+  onChange?: (val: number) => void;
 }
 
 const StarRating = ({ value, onChange }: StarRatingProps) => {

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
 @theme {
   /* 設定主題色 */
   --color-primary: #f4ac45;

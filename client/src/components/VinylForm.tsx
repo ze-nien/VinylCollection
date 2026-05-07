@@ -37,8 +37,11 @@ const VinylForm = () => {
     defaultValues: {
       album: "",
       artist: "",
+      genre: [],
+      coverUrl: "",
       year: undefined,
-      albumRating: 0,
+      albumRating: 1,
+      notes: "",
     },
     mode: "onChange", //輸入錯立刻顯示errors.message
   });
@@ -103,7 +106,7 @@ const VinylForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
-      <div className="grid grid-cols-2 gap-4 items-center">
+      <div className="grid grid-cols-2 gap-4 items-start">
         <FormField
           id="album"
           label="Album"
@@ -129,20 +132,21 @@ const VinylForm = () => {
           max={new Date().getFullYear()}
           error={errors.year?.message as string}
           {...register("year", {
-            setValueAs: (value) => {
-              if (value === "" || value === undefined || value === null)
-                return undefined;
-
-              const num = Number(value);
-              return Number.isNaN(num) ? undefined : num;
-            },
+            setValueAs: (value) => (value === "" ? 0 : Number(value)),
           })}
         />
+        {/* 
+           不是input可以使用register 不具備原生ref、onChange
+           因此使用Controller監控自訂組件狀態 同步回傳RHF 
+           name是物件中的key鍵
+           rander回傳function 原參數methods含field fieldState formState
+           解構field傳入函數 其包含value、onChange、onBlur、name、ref屬性
+        */}
         <Controller
           control={control}
-          name={`albumRating`}
+          name="albumRating"
           render={({ field }) => (
-            <div className="flex items-center gap-2 mt-4">
+            <div className="h-full flex gap-1 items-center justify-center">
               <span>Album Rating:</span>
               <StarRating value={field.value || 0} onChange={field.onChange} />
             </div>

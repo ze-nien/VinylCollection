@@ -7,7 +7,11 @@ export const vinylSchema = z.object({
   artist: z.string().min(1, "演出者必填"),
   genre: z.array(z.enum(GENRES)).optional(),
   coverUrl: z.string().optional(),
-  year: z.number().min(1800).max(new Date().getFullYear()).optional(),
-  albumRating: z.number().min(0).max(5).optional(),
+  year: z
+    .number()
+    .min(1800, "不早於1800年")
+    .max(new Date().getFullYear(), "不超過今年")
+    .optional(),
+  albumRating: z.number().min(1, "最少一顆星").max(5),
   notes: z.string().optional(),
 });

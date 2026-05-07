@@ -13,7 +13,7 @@ export const getAllVinyls = async (req, res, next) => {
 //新增資料POST('api/vinyls')
 export const createVinyl = async (req, res, next) => {
   try {
-    const { album, artist, genre, coverUrl, year, tracks, comment, rating } =
+    const { album, artist, genre, coverUrl, year, albumRating, notes } =
       req.body;
     console.log(req.body);
     const newVinyl = await Vinyl.create({
@@ -22,9 +22,8 @@ export const createVinyl = async (req, res, next) => {
       genre,
       coverUrl,
       year,
-      tracks,
-      comment,
-      rating,
+      albumRating,
+      notes,
     });
     res.status(200).json(newVinyl);
   } catch (e) {
