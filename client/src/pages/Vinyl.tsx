@@ -20,28 +20,33 @@ const Vinyl = () => {
   return (
     <div className="max-w-screen-xl mx-auto px-4 w-full">
       {/* [repeat(auto-fit,minmax(250px,1fr))] */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-        {isLoading && <Spinner />}
-        {vinyls.map((vinyl) => (
-          <VinylCard key={vinyl._id} vinyl={vinyl} />
-        ))}
-      </div>
-      {pagination && (
-        <div className="flex justify-center gap-4 mt-8">
-          {Array.from({ length: pagination.pages }, (_, i) => i + 1).map(
-            (page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`px-4 py-2 rounded-md ${
-                  pagination.page === page
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 text-gray-700"
-                }`}
-              >
-                {page}
-              </button>
-            ),
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            {vinyls.map((vinyl) => (
+              <VinylCard key={vinyl._id} vinyl={vinyl} />
+            ))}
+          </div>
+          {pagination && (
+            <div className="flex justify-center gap-4 mt-8">
+              {Array.from({ length: pagination.pages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-4 py-2 rounded-md ${
+                      pagination.page === page
+                        ? "bg-primary text-white"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
+            </div>
           )}
         </div>
       )}
