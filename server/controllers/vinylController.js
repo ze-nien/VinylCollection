@@ -1,10 +1,29 @@
+import axios from "axios";
 import Vinyl from "../models/Vinyl.js";
+import { fetchAlbumCover } from "../services/lastFmService.js";
 
 //所有資料GET('api/vinyls')
 export const getAllVinyls = async (req, res, next) => {
   try {
-    const vinyls = await Vinyl.find().sort({ createdAt: -1 });
-    res.status(200).json(vinyls);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const [vinyls, total] = await Promise.all([
+      Vinyl.find().skip(skip).limit(limit).sort({ createdAt: -1 }),
+      Vinyl.countDocuments(),
+    ]);
+    res.status(200).json({
+      data: vinyls,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+        limit,
+      },
+    });
+    // const vinyls = await Vinyl.find().sort({ createdAt: -1 });
+    // res.status(200).json(vinyls);
   } catch (e) {
     next(e);
   }
@@ -13,9 +32,12 @@ export const getAllVinyls = async (req, res, next) => {
 //新增資料POST('api/vinyls')
 export const createVinyl = async (req, res, next) => {
   try {
-    const { album, artist, genre, coverUrl, year, albumRating, notes } =
-      req.body;
-    console.log(req.body);
+    const { album, artist, genre, year, albumRating, notes } = req.body;
+    // console.log(req.body);
+
+    const fetchCoverUrl = await fetchAlbumCover(artist, album);
+    const coverUrl =
+      fetchCoverUrl === "none" ? "/images/DEFAULT.jpg" : fetchCoverUrl;
     const newVinyl = await Vinyl.create({
       album,
       artist,
@@ -56,9 +78,18 @@ export const editVinyl = async (req, res, next) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-    const newData = await Vinyl.findByIdAndUpdate(id, updateData, {
-      runVaildators: true,
-    });
+    const { artist, album } = updateData;
+    const fetchCoverUrl = await fetchAlbumCover(artist, album);
+    const coverUrl =
+      fetchCoverUrl === "none" ? "/images/DEFAULT.jpg" : fetchCoverUrl;
+
+    const newData = await Vinyl.findByIdAndUpdate(
+      id,
+      { ...updateData, coverUrl },
+      {
+        runVaildators: true,
+      },
+    );
     if (!newData) {
       const error = new Error("找不到該黑膠唱片的 ID，無法編輯");
       res.statusCode = 404;

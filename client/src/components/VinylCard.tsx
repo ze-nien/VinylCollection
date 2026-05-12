@@ -5,13 +5,14 @@ import { useVinylStore } from "../store/vinylStore.ts";
 const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
   const deleteVinyl = useVinylStore((s) => s.deleteVinyl);
   return (
-    <div className="">
+    <div className="flex flex-col w-full">
       {/* 圖 */}
       <div className="aspect-square">
         <img
-          src={vinyl.coverUrl || ""}
+          src={vinyl.coverUrl || "/images/DEFAULT.jpg"}
           alt=""
           className="w-full h-full object-cover"
+          onError={(e) => (e.currentTarget.src = "/images/DEFAULT.jpg")}
         />
       </div>
       {/* 資訊 */}

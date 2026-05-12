@@ -2,12 +2,24 @@ import axios from "axios";
 import { create } from "zustand";
 import type { Vinyl, VinylBase } from "../types/vinyl";
 
+interface Pagination {
+  total: number;
+  page: number;
+  pages: number;
+  limit: number;
+}
+
+interface FetchVinylsResponse {
+  data: Vinyl[];
+  pagination: Pagination;
+}
 interface VinylState {
   vinyls: Vinyl[];
+  pagination: Pagination | null;
   vinyl: Vinyl | null;
   error: string | null;
   isLoading: boolean;
-  fetchVinyls: () => Promise<void>;
+  fetchVinyls: (page?: number, limit?: number) => Promise<void>;
   fetchVinyl: (id: string) => Promise<void>;
   addVinyl: (newVinyl: VinylBase) => Promise<void>;
   updateVinyl: (id: string, updatedVinyl: VinylBase) => Promise<void>;
@@ -17,15 +29,24 @@ interface VinylState {
 
 export const useVinylStore = create<VinylState>((set) => ({
   vinyls: [],
+  pagination: null,
   vinyl: null,
   error: null,
   isLoading: false,
-  fetchVinyls: async () => {
+  fetchVinyls: async (page = 1, limit = 16) => {
     try {
       set({ isLoading: true });
-      await new Promise((r) => setTimeout(r, 1000)); //模擬載入一秒
-      const res = await axios.get<Vinyl[]>("http://localhost:3000/api/vinyls");
-      if (res) set({ vinyls: res.data, isLoading: false });
+      // await new Promise((r) => setTimeout(r, 1000)); //模擬載入一秒
+      // const res = await axios.get<Vinyl[]>("http://localhost:3000/api/vinyls");
+      const res = await axios.get<FetchVinylsResponse>(
+        `http://localhost:3000/api/vinyls?page=${page}&limit=${limit}`,
+      );
+      if (res)
+        set({
+          vinyls: res.data.data,
+          pagination: res.data.pagination,
+          isLoading: false,
+        });
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         const errorMessage =
