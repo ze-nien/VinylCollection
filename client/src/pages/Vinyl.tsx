@@ -19,10 +19,9 @@ const Vinyl = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 w-full">
-      {/* [repeat(auto-fit,minmax(250px,1fr))] */}
       {isLoading ? (
         <Spinner />
-      ) : (
+      ) : vinyls.length > 0 ? (
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
             {vinyls.map((vinyl) => (
@@ -30,16 +29,17 @@ const Vinyl = () => {
             ))}
           </div>
           {pagination && (
-            <div className="flex justify-center gap-4 mt-8">
+            <div className="flex justify-center items-center gap-4 mt-8">
               {Array.from({ length: pagination.pages }, (_, i) => i + 1).map(
                 (page) => (
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`px-4 py-2 rounded-md ${
+                    disabled={pagination.page === page}
+                    className={`px-3 py-2 rounded-md bg-transparent ${
                       pagination.page === page
-                        ? "bg-primary text-white"
-                        : "bg-gray-200 text-gray-700"
+                        ? "text-primary"
+                        : "bg-gray-200 text-gray-500 hover:cursor-pointer hover:text-white transition"
                     }`}
                   >
                     {page}
@@ -49,6 +49,8 @@ const Vinyl = () => {
             </div>
           )}
         </div>
+      ) : (
+        <h3 className="m-5 text-center">No data</h3>
       )}
     </div>
   );

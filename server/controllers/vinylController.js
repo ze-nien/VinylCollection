@@ -4,22 +4,37 @@ import { fetchAlbumCover } from "../services/lastFmService.js";
 
 //所有資料GET('api/vinyls')
 export const getAllVinyls = async (req, res, next) => {
+  console.log(req);
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+    const {
+      page = 1,
+      limit = 12,
+      sort,
+      genre,
+      yearRange,
+      minRating,
+    } = req.query;
+
+    const skip = (Number(page) - 1) * Number(limit); //跳過資料數
+    let query = {}; //初始化查詢物件
+    if (genre) query.genre = { $in: genre.split(",") }; // $in包含(mongoDB語法)
+    if (yearRange === "80s") query.year = { $gte: 1980, $lte: 1989 }; // $gte大於等於 $lte小於等於 (mongoDB語法)
+    if (minRating) query.albumRating = { $gte: Number(minRating) };
+    let sortOrder = { createdAt: -1 };
+    if (sort === "asc") sortOrder = { artist: 1 };
+    if (sort === "desc") sortOrder = { artist: -1 };
 
     const [vinyls, total] = await Promise.all([
-      Vinyl.find().skip(skip).limit(limit).sort({ createdAt: -1 }),
-      Vinyl.countDocuments(),
+      Vinyl.find(query).sort(sortOrder).skip(skip).limit(limit),
+      Vinyl.countDocuments(query),
     ]);
     res.status(200).json({
       data: vinyls,
       pagination: {
         total,
-        page,
+        page: Number(page),
         pages: Math.ceil(total / limit),
-        limit,
+        limit: Number(limit),
       },
     });
     // const vinyls = await Vinyl.find().sort({ createdAt: -1 });

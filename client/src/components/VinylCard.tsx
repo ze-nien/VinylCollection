@@ -30,12 +30,12 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
       </div>
 
       {/* 分類 */}
-      <div className="flex flex-wrap ">
+      <div className="flex flex-wrap gap-1">
         {vinyl.genre && vinyl.genre.length > 0
           ? vinyl.genre.map((g) => (
               <span
                 key={g}
-                className="m-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full"
+                className="text-xs bg-primary text-secondary px-2 py-0.5 rounded-full border"
               >
                 #{g}
               </span>
@@ -55,13 +55,13 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
       <div className="flex gap-2 items-center">
         <Link
           to={`edit/${vinyl._id}`}
-          className="text-white hover:text-gray-400 transition-colors"
+          className="text-gray-300 hover:text-gray-400 transition-colors"
         >
           edit
         </Link>
         <button
           onClick={() => deleteVinyl(vinyl._id)}
-          className="text-white hover:text-red-300 cursor-pointer transition-colors"
+          className="text-red-200 hover:text-red-400 cursor-pointer transition-colors"
         >
           delete
         </button>
