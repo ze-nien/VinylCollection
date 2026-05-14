@@ -7,14 +7,14 @@ interface FieldWrapperProps extends BaseProps {
 
 const FieldWrapper = ({ label, error, id, children }: FieldWrapperProps) => {
   return (
-    <div className="relative flex flex-col m-2">
-      <label htmlFor={id}>{label}: </label>
-      {children}
-      <div className="absolute right-0">
+    <div className="flex flex-col">
+      <div className="flex justify-between items-center">
+        <label htmlFor={id}>{label}: </label>
         {error && (
-          <span className="text-xs text-red-500 font-medium">{error}</span>
+          <span className="text-xs text-red-400 font-medium">{error}</span>
         )}
       </div>
+      {children}
     </div>
   );
 };

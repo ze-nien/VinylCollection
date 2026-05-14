@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { SubmitErrorHandler, SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
@@ -8,12 +8,9 @@ import type { VinylBase } from "../types/vinyl";
 import { vinylSchema } from "../../../shared/vinylSchema";
 import { GENRES } from "../../../shared/constants";
 import { useVinylStore } from "../store/vinylStore";
-import DEFAULT_COVER from "../images/DEFAULT.jpg";
-import DEFAULT_404_COVER from "../images/DEFAULT_404.jpg";
 
 import FormField from "./FormField";
 import StarRating from "./StarRating";
-import CoverReview from "./CoverReview";
 
 const VinylForm = () => {
   const navigate = useNavigate();
@@ -29,7 +26,6 @@ const VinylForm = () => {
     register,
     handleSubmit,
     control,
-    reset,
     formState: { errors },
   } = useForm<VinylBase>({
     // 透過 zodResolver 把 vinylSchema 的驗證規則整合到 react-hook-form 中
@@ -43,45 +39,29 @@ const VinylForm = () => {
       albumRating: 1,
       notes: "",
     },
+    //values 傳進來的變數發生變動時 自動把資料填入表單各個輸入框中
+    values: vinyl //偵測vinyl從undefined變成一筆黑膠唱片資料 自動調用reset()
+      ? {
+          ...vinyl,
+          year: vinyl.year ? Number(vinyl.year) : undefined,
+          coverUrl: vinyl.coverUrl ? String(vinyl.coverUrl) : "",
+          albumRating: vinyl.albumRating ? Number(vinyl.albumRating) : 1,
+        }
+      : undefined,
     mode: "onChange", //輸入錯立刻顯示errors.message
   });
 
+  //編輯頁載入資料
   useEffect(() => {
     if (id) fetchVinyl(id);
     return () => clearVinyl();
   }, [id, fetchVinyl, clearVinyl]);
-  useEffect(() => {
-    if (vinyl) {
-      const isDefault =
-        !vinyl.coverUrl ||
-        vinyl.coverUrl === DEFAULT_COVER ||
-        vinyl.coverUrl === DEFAULT_404_COVER;
-      reset({
-        ...vinyl,
-        year: vinyl.year ? Number(vinyl.year) : undefined,
-        coverUrl: isDefault ? "" : String(vinyl.coverUrl),
-        albumRating: vinyl.albumRating ? Number(vinyl.albumRating) : undefined,
-      });
-    }
-  }, [vinyl, reset]);
 
   const onSubmit: SubmitHandler<VinylBase> = async (data) => {
-    const checkImg = (url: string): Promise<string> => {
-      return new Promise((resolve) => {
-        if (!url) resolve(DEFAULT_COVER);
-        const img = new Image();
-        img.src = url;
-        img.onload = () => resolve(url);
-        img.onerror = () => resolve(DEFAULT_404_COVER);
-      });
-    };
-    const finalUrl = await checkImg(data.coverUrl || "");
-    const finalData = { ...data, coverUrl: finalUrl };
-
     if (isEditMode && id) {
-      await updateVinyl(id, finalData);
+      await updateVinyl(id, data);
     } else {
-      await addVinyl(finalData);
+      await addVinyl(data);
     }
     navigate("/");
   };
@@ -89,20 +69,6 @@ const VinylForm = () => {
   const onInvalid: SubmitErrorHandler<VinylBase> = (errors) => {
     console.error("❌ 驗證攔截原因:", errors);
   };
-
-  const [coverUrlInput, setCoverUrlInput] = useState("");
-  const [resolveCoverUrl, setResolveCoverUrl] = useState("");
-  const coverUrlRegister = register("coverUrl");
-  const handleCoverUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    coverUrlRegister.onChange(e);
-    setCoverUrlInput(e.target.value);
-  };
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setResolveCoverUrl(coverUrlInput);
-    }, 500);
-    return () => clearTimeout(timer); //清除未計時完畢的timer
-  }, [coverUrlInput]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
@@ -119,7 +85,6 @@ const VinylForm = () => {
           id="artist"
           label="Artist"
           tag="input"
-          required={true}
           error={errors.artist?.message as string}
           {...register("artist")}
         />
@@ -128,8 +93,9 @@ const VinylForm = () => {
           label="Year"
           tag="input"
           type="number"
-          min="1800"
+          min="1950"
           max={new Date().getFullYear()}
+          suppressHydrationWarning //忽略此處的伺服器與客戶端時間差
           error={errors.year?.message as string}
           {...register("year", {
             setValueAs: (value) => (value === "" ? 0 : Number(value)),
@@ -152,19 +118,6 @@ const VinylForm = () => {
             </div>
           )}
         />
-
-        <div className="col-span-2">
-          <FormField
-            id="coverUrl"
-            label="CoverUrl"
-            tag="input"
-            error={errors.coverUrl?.message as string}
-            {...register("coverUrl")}
-            onChange={handleCoverUrlChange}
-          />
-          <CoverReview url={vinyl?.coverUrl || resolveCoverUrl} />
-        </div>
-        {/* <div className="col-span-2"></div> */}
         <div className="col-span-2">
           <FormField
             id="genre"
