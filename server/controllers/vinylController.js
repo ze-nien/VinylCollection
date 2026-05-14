@@ -12,14 +12,24 @@ export const getAllVinyls = async (req, res, next) => {
       sort,
       genre,
       yearRange,
-      minRating,
+      minAlbumRating,
     } = req.query;
 
     const skip = (Number(page) - 1) * Number(limit); //跳過資料數
     let query = {}; //初始化查詢物件
     if (genre) query.genre = { $in: genre.split(",") }; // $in包含(mongoDB語法)
-    if (yearRange === "80s") query.year = { $gte: 1980, $lte: 1989 }; // $gte大於等於 $lte小於等於 (mongoDB語法)
-    if (minRating) query.albumRating = { $gte: Number(minRating) };
+    // $gte大於等於 $lte小於等於 (mongoDB語法)
+    if (yearRange && yearRange.endsWith("s") && yearRange !== "All") {
+      const decade = parseInt(yearRange);
+      //1950 - 2049
+      const fullYear = decade >= 50 ? 1900 + decade : 2000 + decade;
+      query.year = {
+        $gte: fullYear,
+        $lte: fullYear + 9,
+      };
+    }
+    if (minAlbumRating && minAlbumRating !== "All")
+      query.albumRating = { $gte: Number(minAlbumRating) };
     let sortOrder = { createdAt: -1 };
     if (sort === "asc") sortOrder = { artist: 1 };
     if (sort === "desc") sortOrder = { artist: -1 };

@@ -11,13 +11,13 @@ export interface BaseProps {
   error?: string;
   id: string;
 }
-export type FormFieldInputProps = BaseProps & {
+type FormFieldInputProps = BaseProps & {
   tag: "input";
 } & ComponentPropsWithRef<"input">;
-export type FormFieldTextareaProps = BaseProps & {
+type FormFieldTextareaProps = BaseProps & {
   tag: "textarea";
 } & ComponentPropsWithRef<"textarea">;
-export type FormFieldCheckBoxProps = BaseProps & {
+type FormFieldCheckBoxProps = BaseProps & {
   tag: "checkbox";
   options?: string[];
 } & Omit<ComponentPropsWithRef<"input">, "type">;

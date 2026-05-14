@@ -21,15 +21,15 @@ interface Filter {
   artistSort: string; // createdAt | asc | desc
   genre: string[];
   yearRange: string; // ~80s | 90s | 00s | 10s | 20s
-  rating: number | null; // 3,4,5 | All
+  albumRating: string; // 3,4,5 | All
 }
 
 //篩選初始值
 const initialFilters: Filter = {
   artistSort: "createdAt", // 預設排序：最新
   genre: [], // 預設不限曲風
-  yearRange: "", // 預設不限年代
-  rating: null, // 預設不限評分
+  yearRange: "All", // 預設不限年代
+  albumRating: "All", // 預設不限評分
 };
 
 interface VinylState {
@@ -79,7 +79,7 @@ export const useVinylStore = create<VinylState>((set, get) => ({
         sort: filters.artistSort,
         genre: filters.genre.join(","),
         yearRange: filters.yearRange,
-        minRating: filters.rating?.toString() || "",
+        minAlbumRating: filters.albumRating?.toString() || "",
       });
       // await new Promise((r) => setTimeout(r, 1000)); //模擬載入一秒
       const res = await axios.get<FetchVinylsResponse>(

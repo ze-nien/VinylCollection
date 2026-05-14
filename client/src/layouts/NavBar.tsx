@@ -11,7 +11,7 @@ const NavBar = () => {
   `;
 
   return (
-    <div className="bg-primary p-5 flex gap-3">
+    <div className=" sticky top-0 z-50 h-16 bg-primary p-5 flex gap-3">
       {navItems.map((item) => (
         <NavLink key={item.path} to={item.path} className={checkActive}>
           {item.label}

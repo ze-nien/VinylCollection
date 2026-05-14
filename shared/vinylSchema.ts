@@ -9,7 +9,7 @@ export const vinylSchema = z.object({
   coverUrl: z.string().optional(),
   year: z
     .number()
-    .min(1800, "不早於1800年")
+    .min(1950, "不早於1950年")
     .max(new Date().getFullYear(), "不超過今年")
     .optional(),
   albumRating: z.number().min(1, "最少一顆星").max(5),

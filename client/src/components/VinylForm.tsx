@@ -26,7 +26,6 @@ const VinylForm = () => {
     register,
     handleSubmit,
     control,
-    reset,
     formState: { errors },
   } = useForm<VinylBase>({
     // 透過 zodResolver 把 vinylSchema 的驗證規則整合到 react-hook-form 中
@@ -40,6 +39,15 @@ const VinylForm = () => {
       albumRating: 1,
       notes: "",
     },
+    //values 傳進來的變數發生變動時 自動把資料填入表單各個輸入框中
+    values: vinyl //偵測vinyl從undefined變成一筆黑膠唱片資料 自動調用reset()
+      ? {
+          ...vinyl,
+          year: vinyl.year ? Number(vinyl.year) : undefined,
+          coverUrl: vinyl.coverUrl ? String(vinyl.coverUrl) : "",
+          albumRating: vinyl.albumRating ? Number(vinyl.albumRating) : 1,
+        }
+      : undefined,
     mode: "onChange", //輸入錯立刻顯示errors.message
   });
 
@@ -48,16 +56,6 @@ const VinylForm = () => {
     if (id) fetchVinyl(id);
     return () => clearVinyl();
   }, [id, fetchVinyl, clearVinyl]);
-  useEffect(() => {
-    if (vinyl) {
-      reset({
-        ...vinyl,
-        year: vinyl.year ? Number(vinyl.year) : undefined,
-        coverUrl: vinyl.coverUrl ? String(vinyl.coverUrl) : "",
-        albumRating: vinyl.albumRating ? Number(vinyl.albumRating) : undefined,
-      });
-    }
-  }, [vinyl, reset]);
 
   const onSubmit: SubmitHandler<VinylBase> = async (data) => {
     if (isEditMode && id) {
@@ -71,25 +69,6 @@ const VinylForm = () => {
   const onInvalid: SubmitErrorHandler<VinylBase> = (errors) => {
     console.error("❌ 驗證攔截原因:", errors);
   };
-
-  // const [watchedArtist, watchedAlbum] = useWatch({
-  //   control,
-  //   name: ["artist", "album"],
-  // });
-  // const [testCover, setTestCover] = useState("");
-  // useEffect(() => {
-  //   if (!watchedArtist || !watchedAlbum) return;
-  //   const timer = setTimeout(async () => {
-  //     try {
-  //       const fetchUrl = await fetchCover(watchedArtist, watchedAlbum);
-  //       if (fetchUrl) setTestCover(fetchUrl);
-  //       // console.log(testCover);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }, 1000);
-  //   return () => clearTimeout(timer);
-  // }, [watchedArtist, watchedAlbum, testCover, setTestCover]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
@@ -106,7 +85,6 @@ const VinylForm = () => {
           id="artist"
           label="Artist"
           tag="input"
-          required={true}
           error={errors.artist?.message as string}
           {...register("artist")}
         />
@@ -115,8 +93,9 @@ const VinylForm = () => {
           label="Year"
           tag="input"
           type="number"
-          min="1800"
+          min="1950"
           max={new Date().getFullYear()}
+          suppressHydrationWarning //忽略此處的伺服器與客戶端時間差
           error={errors.year?.message as string}
           {...register("year", {
             setValueAs: (value) => (value === "" ? 0 : Number(value)),
@@ -139,15 +118,6 @@ const VinylForm = () => {
             </div>
           )}
         />
-        <div className="col-span-2">
-          <FormField
-            id="coverUrl"
-            label="CoverUrl"
-            tag="input"
-            error={errors.coverUrl?.message as string}
-            {...register("coverUrl")}
-          />
-        </div>
         <div className="col-span-2">
           <FormField
             id="genre"
