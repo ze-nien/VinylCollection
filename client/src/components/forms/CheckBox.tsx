@@ -10,7 +10,7 @@ const CheckBox = ({ options, ...checkboxProps }: CheckBoxElementProps) => {
               type="checkbox"
               value={opt}
               {...checkboxProps}
-              className="w-4 h-4 rounded border-gray-300 text-primary focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-primary"
+              className="size-4 rounded border-gray-300 text-primary focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-primary"
             />
             <span className="text-primary text-sm">{opt}</span>
           </label>

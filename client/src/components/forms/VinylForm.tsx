@@ -4,10 +4,10 @@ import type { SubmitErrorHandler, SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import type { VinylBase } from "../types/vinyl";
-import { vinylSchema } from "../../../shared/vinylSchema";
-import { GENRES } from "../../../shared/constants";
-import { useVinylStore } from "../store/vinylStore";
+import type { VinylBase } from "../../types/vinyl";
+import { vinylSchema } from "../../../../shared/vinylSchema";
+import { GENRES } from "../../../../shared/constants";
+import { useVinylStore } from "../../store/vinylStore";
 
 import FormField from "./FormField";
 import StarRating from "./StarRating";
@@ -72,12 +72,11 @@ const VinylForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
-      <div className="grid grid-cols-2 gap-4 items-start">
+      <div className="p-2 grid grid-cols-2 gap-4 items-start">
         <FormField
           id="album"
           label="Album"
           tag="input"
-          required={true}
           error={errors.album?.message as string}
           {...register("album")}
         />

@@ -18,14 +18,15 @@ interface FetchVinylsResponse {
 
 //篩選定義
 interface Filter {
+  limit: number;
   artistSort: string; // createdAt | asc | desc
   genre: string[];
   yearRange: string; // ~80s | 90s | 00s | 10s | 20s
   albumRating: string; // 3,4,5 | All
 }
-
 //篩選初始值
 const initialFilters: Filter = {
+  limit: 12, //預設每頁12筆
   artistSort: "createdAt", // 預設排序：最新
   genre: [], // 預設不限曲風
   yearRange: "All", // 預設不限年代
@@ -33,16 +34,13 @@ const initialFilters: Filter = {
 };
 
 interface VinylState {
-  vinyls: Vinyl[];
-  pagination: Pagination | null; //***
-  limit: number;
-  vinyl: Vinyl | null;
-  error: string | null;
-  isLoading: boolean;
-  filters: Filter;
-  setLimit: (newLimit: number) => void; //設置每頁數
+  vinyls: Vinyl[]; //多個資料
+  pagination: Pagination | null; //頁數定義在VinylState內與後端接收資料時一起更新
+  vinyl: Vinyl | null; //單一資料
+  error: string | null; //錯誤訊息
+  isLoading: boolean; //讀取狀態
+  filters: Filter; //篩選
   updateFilter: (newFilters: Partial<Filter>) => void; //更新局部篩選
-  resetFilters: () => void; //清除篩選
   fetchVinyls: (page?: number, limit?: number) => Promise<void>; //取得所有
   fetchVinyl: (id: string) => Promise<void>; //取得特定
   addVinyl: (newVinyl: VinylBase) => Promise<void>; //新增
@@ -54,28 +52,32 @@ interface VinylState {
 export const useVinylStore = create<VinylState>((set, get) => ({
   vinyls: [],
   pagination: null,
-  limit: 12,
   vinyl: null,
   error: null,
   isLoading: false,
   filters: initialFilters,
-  setLimit: (newLimit: number) => set({ limit: newLimit }),
   updateFilter: (newFilter) => {
-    set((s) => ({ filters: { ...s.filters, ...newFilter } }));
+    set((s) => {
+      const updatedFilters = { ...s.filters, ...newFilter };
+      // 如果有pagination資料->page重置為1
+      const updatedPagination = s.pagination
+        ? { ...s.pagination, page: 1 }
+        : null;
+
+      return {
+        filters: updatedFilters,
+        pagination: updatedPagination,
+      };
+    });
     get().fetchVinyls(1);
   },
-  resetFilters: () => {
-    set({ filters: initialFilters });
-    get().fetchVinyls(1);
-  },
-  fetchVinyls: async (page = 1, newLimit) => {
+  fetchVinyls: async (page = 1) => {
     try {
       set({ isLoading: true });
-      const { filters, limit } = get();
-      const currentLimit = newLimit || limit;
+      const { filters } = get();
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: currentLimit.toString(),
+        limit: filters.limit.toString(),
         sort: filters.artistSort,
         genre: filters.genre.join(","),
         yearRange: filters.yearRange,
@@ -89,7 +91,6 @@ export const useVinylStore = create<VinylState>((set, get) => ({
         set({
           vinyls: res.data.data,
           pagination: res.data.pagination,
-          limit: currentLimit,
           isLoading: false,
         });
     } catch (e: unknown) {

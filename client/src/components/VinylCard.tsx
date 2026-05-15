@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import type { Vinyl } from "../types/vinyl.ts";
 import { useVinylStore } from "../store/vinylStore.ts";
-
+//複雜度
 const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
   const deleteVinyl = useVinylStore((s) => s.deleteVinyl);
   return (

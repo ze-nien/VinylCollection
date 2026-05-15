@@ -9,7 +9,7 @@ const Layout = () => {
       <NavBar />
       <main className="flex-1 flex flex-col md:flex-row items-stretch md:items-start">
         <SideBar />
-        <div className="flex-1 mt-5">
+        <div className="flex-1 pt-5 md:border-l-2 md:border-primary">
           <Outlet />
         </div>
       </main>

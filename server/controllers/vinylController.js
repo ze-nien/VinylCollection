@@ -47,8 +47,6 @@ export const getAllVinyls = async (req, res, next) => {
         limit: Number(limit),
       },
     });
-    // const vinyls = await Vinyl.find().sort({ createdAt: -1 });
-    // res.status(200).json(vinyls);
   } catch (e) {
     next(e);
   }

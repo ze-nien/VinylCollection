@@ -1,8 +1,8 @@
-import type { FormFieldProps } from "../types/formField";
-import CheckBox from "./ui/CheckBox";
+import type { FormFieldProps } from "../../types/formField";
+import CheckBox from "./CheckBox";
 import FieldWrapper from "./FieldWrapper";
-import Input from "./ui/Input";
-import TextArea from "./ui/TextArea";
+import Input from "./Input";
+import TextArea from "./TextArea";
 
 const RenderElement = (props: FormFieldProps) => {
   switch (props.tag) {

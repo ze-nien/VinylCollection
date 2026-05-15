@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import VinylCard from "../components/VinylCard";
 import { useVinylStore } from "../store/vinylStore";
-import Spinner from "../components/ui/Spinner";
+import Spinner from "../components/forms/Spinner";
 
 const Vinyl = () => {
   const vinyls = useVinylStore((s) => s.vinyls);

@@ -3,7 +3,7 @@ import Layout from "./layouts/Layout";
 import Vinyl from "./pages/Vinyl";
 import Stats from "./pages/Stats";
 import WishList from "./pages/WishList";
-import VinylForm from "./components/VinylForm";
+import VinylForm from "./components/forms/VinylForm";
 
 export const router = createBrowserRouter([
   {
