@@ -49,6 +49,8 @@ interface VinylState {
   clearVinyl: () => void; //清除
 }
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 export const useVinylStore = create<VinylState>((set, get) => ({
   vinyls: [],
   pagination: null,
@@ -85,7 +87,7 @@ export const useVinylStore = create<VinylState>((set, get) => ({
       });
       // await new Promise((r) => setTimeout(r, 1000)); //模擬載入一秒
       const res = await axios.get<FetchVinylsResponse>(
-        `http://localhost:3000/api/vinyls?${params}`,
+        `${API_URL}/api/vinyls?${params}`,
       );
       if (res)
         set({
@@ -106,9 +108,7 @@ export const useVinylStore = create<VinylState>((set, get) => ({
   fetchVinyl: async (id) => {
     try {
       set({ isLoading: true });
-      const res = await axios.get<Vinyl>(
-        `http://localhost:3000/api/vinyls/${id}`,
-      );
+      const res = await axios.get<Vinyl>(`${API_URL}/api/vinyls/${id}`);
       set({ vinyl: res.data, isLoading: false });
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
@@ -121,10 +121,7 @@ export const useVinylStore = create<VinylState>((set, get) => ({
   addVinyl: async (newVinyl) => {
     set({ isLoading: true });
     try {
-      const res = await axios.post<Vinyl>(
-        "http://localhost:3000/api/vinyls",
-        newVinyl,
-      );
+      const res = await axios.post<Vinyl>(`${API_URL}/api/vinyls`, newVinyl);
       console.log(newVinyl);
       const savedVinyl: Vinyl = {
         ...newVinyl,
@@ -146,7 +143,7 @@ export const useVinylStore = create<VinylState>((set, get) => ({
     set({ isLoading: true });
     try {
       const res = await axios.patch<Vinyl>(
-        `http://localhost:3000/api/vinyls/${id}`,
+        `${API_URL}/api/vinyls/${id}`,
         updatedVinyl,
       );
       set((state) => ({
@@ -165,7 +162,7 @@ export const useVinylStore = create<VinylState>((set, get) => ({
   },
   deleteVinyl: async (id) => {
     try {
-      await axios.delete<Vinyl>(`http://localhost:3000/api/vinyls/${id}`);
+      await axios.delete<Vinyl>(`${API_URL}/api/vinyls/${id}`);
       set((state) => ({
         vinyls: state.vinyls.filter((vinyl) => vinyl._id !== id),
       }));
