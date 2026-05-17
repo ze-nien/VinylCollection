@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { SubmitErrorHandler, SubmitHandler } from "react-hook-form";
-import { useNavigate, useParams } from "react-router";
+import { useBlocker, useNavigate, useParams } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { VinylBase } from "../../types/vinyl";
@@ -11,6 +11,8 @@ import { useVinylStore } from "../../store/vinylStore";
 
 import FormField from "./FormField";
 import StarRating from "./StarRating";
+import Modal from "../Modal";
+import toast from "react-hot-toast";
 
 const VinylForm = () => {
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ const VinylForm = () => {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isDirty, isSubmitSuccessful },
   } = useForm<VinylBase>({
     // 透過 zodResolver 把 vinylSchema 的驗證規則整合到 react-hook-form 中
     resolver: zodResolver(vinylSchema),
@@ -60,6 +62,7 @@ const VinylForm = () => {
   const onSubmit: SubmitHandler<VinylBase> = async (data) => {
     if (isEditMode && id) {
       await updateVinyl(id, data);
+      toast.success("編輯成功");
     } else {
       await addVinyl(data);
     }
@@ -70,77 +73,99 @@ const VinylForm = () => {
     console.error("❌ 驗證攔截原因:", errors);
   };
 
+  //useBlocker在換頁時攔截 .state有unblocked未攔截、blocked攔截、proceeding換頁
+  const blocker = useBlocker(() => {
+    //表單變動且submit未成功時攔截
+    return isDirty && !isSubmitSuccessful;
+  });
+
   return (
-    <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
-      <div className="p-2 grid grid-cols-2 gap-4 items-start">
-        <FormField
-          id="album"
-          label="Album"
-          tag="input"
-          error={errors.album?.message as string}
-          {...register("album")}
-        />
-        <FormField
-          id="artist"
-          label="Artist"
-          tag="input"
-          error={errors.artist?.message as string}
-          {...register("artist")}
-        />
-        <FormField
-          id="year"
-          label="Year"
-          tag="input"
-          type="number"
-          min="1950"
-          max={new Date().getFullYear()}
-          suppressHydrationWarning //忽略此處的伺服器與客戶端時間差
-          error={errors.year?.message as string}
-          {...register("year", {
-            setValueAs: (value) => (value === "" ? 0 : Number(value)),
-          })}
-        />
-        {/* 
+    <>
+      {/*blocker是blocked時顯示 並且其狀態有reset與proceed兩個控制函式 */}
+      <Modal
+        isOpen={blocker.state === "blocked"}
+        cancelText="繼續編輯"
+        onClose={() => blocker.reset?.()} //留在原地並解鎖攔截
+        confirmText="放棄編輯"
+        onConfirm={() => blocker.proceed?.()} //放行換頁
+      >
+        <p>您輸入的黑膠唱片資料尚未儲存，現在離開將會遺失所有填寫的進度。</p>
+      </Modal>
+
+      <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
+        <div className="p-2 grid grid-cols-2 gap-4 items-start">
+          <FormField
+            id="album"
+            label="Album"
+            tag="input"
+            error={errors.album?.message as string}
+            {...register("album")}
+          />
+          <FormField
+            id="artist"
+            label="Artist"
+            tag="input"
+            error={errors.artist?.message as string}
+            {...register("artist")}
+          />
+          <FormField
+            id="year"
+            label="Year"
+            tag="input"
+            type="number"
+            min="1950"
+            max={new Date().getFullYear()}
+            suppressHydrationWarning //忽略此處的伺服器與客戶端時間差
+            error={errors.year?.message as string}
+            {...register("year", {
+              setValueAs: (value) => (value === "" ? 0 : Number(value)),
+            })}
+          />
+          {/* 
            不是input可以使用register 不具備原生ref、onChange
            因此使用Controller監控自訂組件狀態 同步回傳RHF 
            name是物件中的key鍵
            rander回傳function 原參數methods含field fieldState formState
            解構field傳入函數 其包含value、onChange、onBlur、name、ref屬性
         */}
-        <Controller
-          control={control}
-          name="albumRating"
-          render={({ field }) => (
-            <div className="h-full flex gap-1 items-center justify-center">
-              <span>Album Rating:</span>
-              <StarRating value={field.value || 0} onChange={field.onChange} />
-            </div>
-          )}
-        />
-        <div className="col-span-2">
-          <FormField
-            id="genre"
-            label="Genre"
-            tag="checkbox"
-            options={[...GENRES]}
-            error={errors.genre?.message as string}
-            {...register("genre")}
+          <Controller
+            control={control}
+            name="albumRating"
+            render={({ field }) => (
+              <div className="h-full flex gap-1 items-center justify-center">
+                <span>Album Rating:</span>
+                <StarRating
+                  value={field.value || 0}
+                  onChange={field.onChange}
+                />
+              </div>
+            )}
           />
+          <div className="col-span-2">
+            <FormField
+              id="genre"
+              label="Genre"
+              tag="checkbox"
+              options={[...GENRES]}
+              error={errors.genre?.message as string}
+              {...register("genre")}
+            />
+          </div>
+          <div className="col-span-2">
+            <FormField
+              id="notes"
+              label="Notes"
+              tag="textarea"
+              error={errors.notes?.message as string}
+              {...register("notes")}
+            />
+          </div>
+          <div className="col-span-2 text-center mb-2">
+            <button type="submit">submit</button>
+          </div>
         </div>
-        <div className="col-span-2">
-          <FormField
-            id="notes"
-            label="Notes"
-            tag="textarea"
-            error={errors.notes?.message as string}
-            {...register("notes")}
-          />
-        </div>
-        <div className="col-span-2 text-center mb-2">
-          <button type="submit">submit</button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </>
   );
 };
 

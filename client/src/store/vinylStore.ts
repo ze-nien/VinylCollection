@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "../api/axiosInstance";
 import { create } from "zustand";
 import type { Vinyl, VinylBase } from "../types/vinyl";
 
@@ -74,8 +75,8 @@ export const useVinylStore = create<VinylState>((set, get) => ({
     get().fetchVinyls(1);
   },
   fetchVinyls: async (page = 1) => {
+    set({ isLoading: true });
     try {
-      set({ isLoading: true });
       const { filters } = get();
       const params = new URLSearchParams({
         page: page.toString(),
@@ -104,10 +105,9 @@ export const useVinylStore = create<VinylState>((set, get) => ({
       }
     }
   },
-
   fetchVinyl: async (id) => {
+    set({ isLoading: true });
     try {
-      set({ isLoading: true });
       const res = await axios.get<Vinyl>(`${API_URL}/api/vinyls/${id}`);
       set({ vinyl: res.data, isLoading: false });
     } catch (e: unknown) {
@@ -121,8 +121,7 @@ export const useVinylStore = create<VinylState>((set, get) => ({
   addVinyl: async (newVinyl) => {
     set({ isLoading: true });
     try {
-      const res = await axios.post<Vinyl>(`${API_URL}/api/vinyls`, newVinyl);
-      console.log(newVinyl);
+      const res = await api.post<Vinyl>(`${API_URL}/api/vinyls`, newVinyl);
       const savedVinyl: Vinyl = {
         ...newVinyl,
         _id: res.data._id,
@@ -142,7 +141,7 @@ export const useVinylStore = create<VinylState>((set, get) => ({
   updateVinyl: async (id, updatedVinyl) => {
     set({ isLoading: true });
     try {
-      const res = await axios.patch<Vinyl>(
+      const res = await api.patch<Vinyl>(
         `${API_URL}/api/vinyls/${id}`,
         updatedVinyl,
       );
@@ -161,16 +160,18 @@ export const useVinylStore = create<VinylState>((set, get) => ({
     }
   },
   deleteVinyl: async (id) => {
+    set({ isLoading: true });
     try {
-      await axios.delete<Vinyl>(`${API_URL}/api/vinyls/${id}`);
+      await api.delete<Vinyl>(`${API_URL}/api/vinyls/${id}`);
       set((state) => ({
         vinyls: state.vinyls.filter((vinyl) => vinyl._id !== id),
+        isLoading: false,
       }));
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         const errorMessage =
           e.response?.data?.message || e.message || "發生未知錯誤";
-        set({ error: errorMessage });
+        set({ isLoading: false, error: errorMessage });
       }
     }
   },

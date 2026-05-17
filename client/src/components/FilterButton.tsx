@@ -1,4 +1,4 @@
-interface BaseButtonProps {
+interface FilterButtonProps {
   options: readonly string[];
   activeValue: string | readonly string[];
   onClick: (value: string) => void;
@@ -10,7 +10,7 @@ const BaseButton = ({
   activeValue,
   onClick,
   className,
-}: BaseButtonProps) => {
+}: FilterButtonProps) => {
   return (
     <div className={className}>
       {options.map((option) => {

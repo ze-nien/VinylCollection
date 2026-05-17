@@ -4,10 +4,12 @@ import { GENRES } from "../../../shared/constants";
 import { useVinylStore } from "../store/vinylStore";
 import BaseSelect from "../components/ui/BaseSelect";
 import BaseRadio from "../components/ui/BaseRadio";
-import BaseButton from "../components/ui/BaseButton";
+import FilterButton from "../components/FilterButton";
+import { useAuthStore } from "../store/authStore";
 
 const SideBar = () => {
   //zustand
+  const isAdmin = useAuthStore((s) => s.isAdmin);
   const vinyl = useVinylStore((s) => s.vinyl);
   const filters = useVinylStore((s) => s.filters);
   const updateFilter = useVinylStore((s) => s.updateFilter);
@@ -26,17 +28,20 @@ const SideBar = () => {
       : [...currentGenres, g];
     updateFilter({ genre: nextGenres });
   };
+
   return (
     <aside
       className="px-2 bg-primary text-secondary border-primary shadow-md
                    md:bg-secondary md:text-primary md:w-44"
     >
-      {curloaction.pathname === "/" && (
+      {isAdmin && curloaction.pathname === "/" && (
         <Link to="/add" className="hover:text-white transition">
           <h3 className="text-2xl md:mt-2 text-center">Add</h3>
         </Link>
       )}
-      {(curloaction.pathname === "/add" || isInvalidRoute) && (
+      {(curloaction.pathname === "/add" ||
+        curloaction.pathname === "/auth/login" ||
+        isInvalidRoute) && (
         <Link to="/" className="hover:text-white transition">
           <h3 className="text-2xl md:mt-2">Home</h3>
         </Link>
@@ -90,7 +95,7 @@ const SideBar = () => {
           {/* Genre */}
           <section>
             <label htmlFor="genre">-Genre-</label>
-            <BaseButton
+            <FilterButton
               options={GENRES}
               activeValue={filters.genre}
               onClick={handleGenreClick}

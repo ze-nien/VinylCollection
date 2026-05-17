@@ -1,9 +1,16 @@
+import { useState } from "react";
 import { Link } from "react-router";
 import type { Vinyl } from "../types/vinyl.ts";
 import { useVinylStore } from "../store/vinylStore.ts";
+import { useAuthStore } from "../store/authStore.ts";
+import Modal from "./Modal.tsx";
+
 //複雜度
 const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
+  const isAdmin = useAuthStore((s) => s.isAdmin);
   const deleteVinyl = useVinylStore((s) => s.deleteVinyl);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
   return (
     <div className="flex flex-col w-48">
       {/* 圖 */}
@@ -52,20 +59,34 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
         )}
       </div>
       {/* 操作 */}
-      <div className="flex gap-2 items-center">
-        <Link
-          to={`edit/${vinyl._id}`}
-          className="text-gray-300 hover:text-gray-400 transition-colors"
-        >
-          edit
-        </Link>
-        <button
-          onClick={() => deleteVinyl(vinyl._id)}
-          className="text-red-200 hover:text-red-400 cursor-pointer transition-colors"
-        >
-          delete
-        </button>
-      </div>
+      {isAdmin && (
+        <div className="flex gap-2 items-center">
+          <Link
+            to={`edit/${vinyl._id}`}
+            className="text-gray-300 hover:text-gray-400 transition-colors"
+          >
+            edit
+          </Link>
+          <button
+            onClick={() => setIsDeleteOpen(true)}
+            className="text-red-200 hover:text-red-400 cursor-pointer transition-colors"
+          >
+            delete
+          </button>
+        </div>
+      )}
+      <Modal
+        isOpen={isDeleteOpen}
+        title="刪除"
+        onClose={() => setIsDeleteOpen(false)}
+        cancelText="取消刪除"
+        onConfirm={() => deleteVinyl(vinyl._id)}
+        confirmText="確定刪除"
+      >
+        <p>
+          確定刪除 {vinyl.artist} - {vinyl.album} ?
+        </p>
+      </Modal>
     </div>
   );
 };

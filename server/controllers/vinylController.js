@@ -4,7 +4,6 @@ import { fetchAlbumCover } from "../services/lastFmService.js";
 
 //所有資料GET('api/vinyls')
 export const getAllVinyls = async (req, res, next) => {
-  console.log(req);
   try {
     const {
       page = 1,

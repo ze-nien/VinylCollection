@@ -14,11 +14,16 @@ import {
   createVinylSchema,
   updateVinylSchema,
 } from "../schemas/vinyl.js";
+
 import validate from "../middlewares/validateMiddleware.js";
 
+//帳號登入驗證
+import verifyAdmin from "../middlewares/authMiddleware.js";
+
 router.get("/", getAllVinyls);
-router.post("/", validate(createVinylSchema), createVinyl);
+router.post("/", verifyAdmin, validate(createVinylSchema), createVinyl);
 router.get("/:id", getVinyl);
-router.patch("/:id", validate(updateVinylSchema), editVinyl);
-router.delete("/:id", validate(checkIdSchema), deleteVinyl);
+router.patch("/:id", verifyAdmin, validate(updateVinylSchema), editVinyl);
+router.delete("/:id", verifyAdmin, validate(checkIdSchema), deleteVinyl);
+
 export default router;
