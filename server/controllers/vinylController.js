@@ -16,7 +16,20 @@ export const getAllVinyls = async (req, res, next) => {
 
     const skip = (Number(page) - 1) * Number(limit); //跳過資料數
     let query = {}; //初始化查詢物件
-    if (genre) query.genre = { $in: genre.split(",") }; // $in包含(mongoDB語法)
+    // $in包含(mongoDB語法)
+    if (genre) {
+      const genreArray = genre.split(",");
+      if (genreArray.includes("uncategorized")) {
+        query.$or = [
+          //過濾uncategorized名稱的假類別(genre沒有此類別)
+          { genre: { $in: genreArray.filter((g) => g !== "uncategorized") } },
+          //加入uncategorized的類別(沒有設定genre的空字串)
+          { genre: { $size: 0 } },
+        ];
+      } else {
+        query.genre = { $in: genre.split(",") };
+      }
+    }
     // $gte大於等於 $lte小於等於 (mongoDB語法)
     if (yearRange && yearRange.endsWith("s") && yearRange !== "All") {
       const decade = parseInt(yearRange);
@@ -86,7 +99,7 @@ export const getVinyl = async (req, res, next) => {
     } else {
       {
         const error = new Error("找不到該黑膠唱片的 ID");
-        res.statusCode = 404;
+        e.status = 404;
         return next(error);
       }
     }
@@ -114,7 +127,7 @@ export const editVinyl = async (req, res, next) => {
     );
     if (!newData) {
       const error = new Error("找不到該黑膠唱片的 ID，無法編輯");
-      res.statusCode = 404;
+      e.status = 404;
       return next(error);
     }
     res.status(200).json({ message: `updateData: ${newData}` });
@@ -130,7 +143,7 @@ export const deleteVinyl = async (req, res, next) => {
     const deleteData = await Vinyl.findByIdAndDelete(id);
     if (!deleteData) {
       const error = new Error("找不到該黑膠唱片的 ID，無法刪除");
-      res.statusCode = 404;
+      e.status = 404;
       return next(error);
     }
     res.status(200).json({ message: `deleteData: ${id}` });

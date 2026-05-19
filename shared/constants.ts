@@ -7,7 +7,6 @@ export const GENRES = [
   "R&B/Soul",
   "Funk",
   "Reggae",
-  "Metal",
   "Punk",
   "Alternative",
   "Indie",

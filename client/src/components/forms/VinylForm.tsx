@@ -28,7 +28,7 @@ const VinylForm = () => {
     register,
     handleSubmit,
     control,
-    formState: { errors, isDirty, isSubmitSuccessful },
+    formState: { errors, isDirty, isSubmitSuccessful, isSubmitting },
   } = useForm<VinylBase>({
     // 透過 zodResolver 把 vinylSchema 的驗證規則整合到 react-hook-form 中
     resolver: zodResolver(vinylSchema),
@@ -60,13 +60,26 @@ const VinylForm = () => {
   }, [id, fetchVinyl, clearVinyl]);
 
   const onSubmit: SubmitHandler<VinylBase> = async (data) => {
-    if (isEditMode && id) {
-      await updateVinyl(id, data);
-      toast.success("編輯成功");
-    } else {
-      await addVinyl(data);
+    try {
+      if (isEditMode && id) {
+        await updateVinyl(id, data);
+
+        toast.success("編輯成功", {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+      } else {
+        await addVinyl(data);
+        toast.success("新增成功");
+      }
+      navigate("/");
+    } catch (e) {
+      console.error("提交黑膠表單時發生權限或阻斷錯誤：", e);
+      navigate("/");
     }
-    navigate("/");
   };
 
   const onInvalid: SubmitErrorHandler<VinylBase> = (errors) => {
@@ -75,8 +88,8 @@ const VinylForm = () => {
 
   //useBlocker在換頁時攔截 .state有unblocked未攔截、blocked攔截、proceeding換頁
   const blocker = useBlocker(() => {
-    //表單變動且submit未成功時攔截
-    return isDirty && !isSubmitSuccessful;
+    //不是編輯模式、表單變動、submit未成功時攔截
+    return !isEditMode && isDirty && !isSubmitSuccessful && !isSubmitting;
   });
 
   return (

@@ -1,5 +1,5 @@
 import type React from "react";
-import type { BaseProps } from "../types/formField";
+import type { BaseProps } from "../../types/formField";
 
 interface FieldWrapperProps extends BaseProps {
   children: React.ReactNode;

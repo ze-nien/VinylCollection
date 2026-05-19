@@ -5,7 +5,7 @@ const TextArea = ({ ...textAreaProps }: TextAreaElementProps) => {
     <div>
       <textarea
         {...textAreaProps}
-        className="text-secondary h-18 resize-none w-full border p-1 rounded focus:ring-primary"
+        className="text-secondary h-18 resize-none w-full border p-1 rounded focus:ring-primary break-all"
       />
     </div>
   );

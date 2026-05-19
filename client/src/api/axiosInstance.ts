@@ -1,38 +1,50 @@
 import axios from "axios";
+import toast from "react-hot-toast";
 import { useAuthStore } from "../store/authStore";
 
-// 建立統一axios實例
+//建立axios實例
 const api = axios.create({
   baseURL: "http://localhost:3000/api",
   timeout: 10000, //發送請求超過10秒視為請求失敗
+  withCredentials: true, //允許跨域請求攜帶並寫入Cookie
 });
 
-// 請求攔截器：每次新增、編輯、刪除時發送API時 先檢查有沒有Token
+//請求攔截器
 api.interceptors.request.use(
-  (config) => {
-    const token = useAuthStore.getState().token;
-    //判斷token與HTTP請求標頭存在 才在標頭加上token回傳
-    if (token && config.headers) {
-      //驗證的種類: 持票人驗證 Bearer [JWT Token]
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
+  (config) => config,
   (error) => {
     return Promise.reject(error);
   },
 );
 
-// 回應攔截器
+//回應攔截器
 api.interceptors.response.use(
-  (response) => response, //成功回應(2xx)：直接回傳完整response
+  (response) => response,
   (error) => {
-    if (
-      error.response &&
-      (error.response.status === 401 || error.response.status === 403)
-      //Token過期或無效（401/403）
-    ) {
-      useAuthStore.getState().logout(); // 清除Token
+    if (error.response) {
+      const { status, data } = error.response;
+      const isCheckAuth = error.config?.url?.includes("auth/me");
+      //自檢401錯誤
+      if (status === 401 && isCheckAuth) return Promise.reject(error);
+      if (status === 401) {
+        if (data?.message === "帳號或密碼錯誤") {
+          toast.error("帳號或密碼錯誤");
+          return Promise.reject(error);
+        }
+        if (data?.message === "拒絕存取，請先登入") {
+          toast.error("拒絕存取，請先登入");
+          useAuthStore.getState().logout();
+          return Promise.reject(error);
+        }
+      }
+      if (status === 403) {
+        console.log("403333333333333333");
+        if (data?.message === "憑證異常，拒絕存取") {
+          toast.error("憑證異常，拒絕存取");
+          useAuthStore.getState().logout();
+          return Promise.reject(error);
+        }
+      }
     }
     return Promise.reject(error);
   },

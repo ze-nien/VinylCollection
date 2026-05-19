@@ -17,6 +17,14 @@ export const router = createBrowserRouter([
         element: <Vinyl />,
       },
       {
+        path: "stats",
+        element: <Stats />,
+      },
+      {
+        path: "wishlist",
+        element: <WishList />,
+      },
+      {
         path: "auth/login",
         element: <Login />,
       },
@@ -31,15 +39,7 @@ export const router = createBrowserRouter([
             path: "edit/:id",
             element: <VinylForm />,
           },
-          {
-            path: "wishlist",
-            element: <WishList />,
-          },
         ],
-      },
-      {
-        path: "stats",
-        element: <Stats />,
       },
     ],
   },

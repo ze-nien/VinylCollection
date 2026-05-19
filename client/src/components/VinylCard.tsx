@@ -7,12 +7,12 @@ import Modal from "./Modal.tsx";
 
 //複雜度
 const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
-  const isAdmin = useAuthStore((s) => s.isAdmin);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
   const deleteVinyl = useVinylStore((s) => s.deleteVinyl);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-
   return (
-    <div className="flex flex-col w-48">
+    <div className="flex flex-col w-50">
       {/* 圖 */}
       <div className="aspect-square">
         <img
@@ -53,13 +53,16 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
       {/* 備註 */}
       <div>
         {vinyl.notes && (
-          <p className="text-xs text-gray-400 line-clamp-2" title={vinyl.notes}>
+          <p
+            className="text-xs text-gray-400 line-clamp-2 break-all"
+            title={vinyl.notes}
+          >
             &quot; {vinyl.notes} &quot;
           </p>
         )}
       </div>
       {/* 操作 */}
-      {isAdmin && (
+      {isAuthenticated && user?.role === "admin" && (
         <div className="flex gap-2 items-center">
           <Link
             to={`edit/${vinyl._id}`}

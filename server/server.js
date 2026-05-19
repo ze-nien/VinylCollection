@@ -6,10 +6,23 @@ import dotenv from "dotenv";
 import AuthRouter from "./routes/authRoutes.js";
 import VinylRouter from "./routes/vinylRoutes.js";
 import errorHandler from "./middlewares/errorMiddleware.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
+console.log(`伺服器運行模式：[${process.env.NODE_ENV}]`);
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    //指定前端網址
+    origin: "http://localhost:5173",
+    //允許前端跨域攜帶 Cookie / 憑證
+    credentials: true,
+    //允許常見的 HTTP 方法與 Headers
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+app.use(cookieParser());
 app.use(express.json());
 
 const mongoURI = process.env.MONGODB_URI;

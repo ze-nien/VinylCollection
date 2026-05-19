@@ -3,14 +3,14 @@ import { useAuthStore } from "../store/authStore";
 
 const NavBar = () => {
   //login
-  const isAdmin = useAuthStore((s) => s.isAdmin);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
 
   const navItems = [
     { path: "/", label: "Vinyl Collection", visible: true },
     { path: "/stats", label: "Stats", visible: true },
-    { path: "/wishlist", label: "Wish List", visible: isAdmin },
-    { path: "/auth/login", label: "Login", visible: !isAdmin },
+    { path: "/wishlist", label: "Wish List", visible: true },
+    { path: "/auth/login", label: "Login", visible: !isAuthenticated },
   ];
 
   const visibleNavItems = navItems.filter((item) => item.visible);
@@ -32,7 +32,7 @@ const NavBar = () => {
         })}
       </div>
       <div className="flex items-center">
-        {isAdmin ? (
+        {isAuthenticated ? (
           <button
             onClick={logout}
             className="font-semibold text-xl hover:text-secondary transition cursor-pointer"

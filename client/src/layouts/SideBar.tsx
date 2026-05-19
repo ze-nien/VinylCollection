@@ -9,7 +9,7 @@ import { useAuthStore } from "../store/authStore";
 
 const SideBar = () => {
   //zustand
-  const isAdmin = useAuthStore((s) => s.isAdmin);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const vinyl = useVinylStore((s) => s.vinyl);
   const filters = useVinylStore((s) => s.filters);
   const updateFilter = useVinylStore((s) => s.updateFilter);
@@ -20,6 +20,7 @@ const SideBar = () => {
   const { id } = useParams();
   const isInvalidRoute = id && vinyl;
   //Genre篩選邏輯
+  const displayGenres = ["uncategorized", ...GENRES];
   const handleGenreClick = (g: string) => {
     const currentGenres = filters.genre || [];
     // 已存在->移除 不存在->加入
@@ -31,10 +32,10 @@ const SideBar = () => {
 
   return (
     <aside
-      className="px-2 bg-primary text-secondary border-primary shadow-md
+      className="px-2 bg-primary/90 text-secondary border-primary shadow-md
                    md:bg-secondary md:text-primary md:w-44"
     >
-      {isAdmin && curloaction.pathname === "/" && (
+      {isAuthenticated && curloaction.pathname === "/" && (
         <Link to="/add" className="hover:text-white transition">
           <h3 className="text-2xl md:mt-2 text-center">Add</h3>
         </Link>
@@ -43,7 +44,7 @@ const SideBar = () => {
         curloaction.pathname === "/auth/login" ||
         isInvalidRoute) && (
         <Link to="/" className="hover:text-white transition">
-          <h3 className="text-2xl md:mt-2">Home</h3>
+          <h3 className="text-2xl md:mt-2 text-center">Home</h3>
         </Link>
       )}
 
@@ -66,20 +67,22 @@ const SideBar = () => {
           `}
         >
           {/* 資料數 */}
-          <BaseSelect
-            label="-perPageData-"
-            name="pageLimit"
-            value={filters.limit}
-            options={[
-              { label: "12", value: 12 },
-              { label: "24", value: 24 },
-              { label: "36", value: 36 },
-            ]}
-            onChange={(val) => updateFilter({ limit: Number(val) })}
-          />
+          <div className="flex justify-center">
+            <BaseSelect
+              label="-perPageData-"
+              name="pageLimit"
+              value={filters.limit}
+              options={[
+                { label: "12", value: 12 },
+                { label: "24", value: 24 },
+                { label: "36", value: 36 },
+              ]}
+              onChange={(val) => updateFilter({ limit: Number(val) })}
+            />
+          </div>
           {/* Artist */}
           <section>
-            <h3>-Sort-</h3>
+            <h3 className="text-center">-Sort-</h3>
             <BaseRadio
               name="sort"
               value={filters.artistSort}
@@ -89,14 +92,14 @@ const SideBar = () => {
                 { label: "Artist Z-A", value: "desc" },
               ]}
               onChange={(value) => updateFilter({ artistSort: value })}
-              className="flex md:flex-col gap-2"
+              className="flex justify-center md:flex-col md:items-start gap-2"
             />
           </section>
           {/* Genre */}
           <section>
-            <label htmlFor="genre">-Genre-</label>
+            <h3 className="text-center">-Genre-</h3>
             <FilterButton
-              options={GENRES}
+              options={displayGenres}
               activeValue={filters.genre}
               onClick={handleGenreClick}
               className="grid grid-cols-5 md:grid-cols-2 gap-1 pr-2"
@@ -104,7 +107,7 @@ const SideBar = () => {
           </section>
           {/* Year */}
           <section>
-            <h3>-Year-</h3>
+            <h3 className="text-center">-Year-</h3>
             <BaseRadio
               name="year"
               value={filters.yearRange}
@@ -117,12 +120,12 @@ const SideBar = () => {
                 { label: "20s", value: "20s" },
               ]}
               onChange={(value) => updateFilter({ yearRange: value })}
-              className="flex md:grid md:grid-cols-3 gap-2"
+              className="flex justify-center md:grid md:grid-cols-3 gap-2"
             />
           </section>
           {/* Rating */}
           <section>
-            <h3>-Rating-</h3>
+            <h3 className="text-center">-Rating-</h3>
             <BaseRadio
               name="albumRating"
               value={filters.albumRating}
@@ -133,7 +136,7 @@ const SideBar = () => {
                 { label: "5 stars", value: "5" },
               ]}
               onChange={(value) => updateFilter({ albumRating: value })}
-              className="flex md:flex-col gap-2"
+              className="flex justify-center md:flex-col md:items-start gap-2"
             />
           </section>
         </div>
