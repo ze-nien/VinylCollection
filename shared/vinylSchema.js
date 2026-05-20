@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GENRES } from "../shared/constants.ts";
+import { GENRES } from "./constants.js";
 
 //資料規格
 export const vinylSchema = z.object({
@@ -13,5 +13,5 @@ export const vinylSchema = z.object({
     .max(new Date().getFullYear(), "不超過今年")
     .optional(),
   albumRating: z.number().min(1, "最少一顆星").max(5),
-  notes: z.string().optional(),
+  notes: z.string().max(200, "備註內容不能超過 200 個字").optional(),
 });

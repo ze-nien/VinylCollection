@@ -5,8 +5,10 @@ import dotenv from "dotenv";
 
 import AuthRouter from "./routes/authRoutes.js";
 import VinylRouter from "./routes/vinylRoutes.js";
+import WishListRouter from "./routes/wishListRoutes.js";
 import errorHandler from "./middlewares/errorMiddleware.js";
 import cookieParser from "cookie-parser";
+import WishList from "./models/WishList.js";
 
 dotenv.config();
 console.log(`伺服器運行模式：[${process.env.NODE_ENV}]`);
@@ -34,6 +36,7 @@ mongoose
 
 app.use("/api/auth", AuthRouter);
 app.use("/api/vinyls", VinylRouter);
+app.use("/api/wishList", WishListRouter);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;

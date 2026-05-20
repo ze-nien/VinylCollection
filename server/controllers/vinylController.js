@@ -1,6 +1,7 @@
 import axios from "axios";
 import Vinyl from "../models/Vinyl.js";
 import { fetchAlbumCover } from "../services/lastFmService.js";
+import { getAllVinylsSchema } from "../schemas/vinyl.js";
 
 //所有資料GET('api/vinyls')
 export const getAllVinyls = async (req, res, next) => {
@@ -12,7 +13,7 @@ export const getAllVinyls = async (req, res, next) => {
       genre,
       yearRange,
       minAlbumRating,
-    } = req.query;
+    } = getAllVinylsSchema.shape.query.parse(req.query);
 
     const skip = (Number(page) - 1) * Number(limit); //跳過資料數
     let query = {}; //初始化查詢物件
@@ -46,6 +47,7 @@ export const getAllVinyls = async (req, res, next) => {
     if (sort === "asc") sortOrder = { artist: 1 };
     if (sort === "desc") sortOrder = { artist: -1 };
 
+    //兩個對資料庫的請求，同時（並行）發送出去->使用 Promise.all
     const [vinyls, total] = await Promise.all([
       Vinyl.find(query).sort(sortOrder).skip(skip).limit(limit),
       Vinyl.countDocuments(query),
@@ -98,9 +100,9 @@ export const getVinyl = async (req, res, next) => {
       res.status(200).json(vinyl);
     } else {
       {
-        const error = new Error("找不到該黑膠唱片的 ID");
+        const e = new Error("找不到該黑膠唱片的 ID");
         e.status = 404;
-        return next(error);
+        return next(e);
       }
     }
   } catch (e) {
@@ -126,9 +128,9 @@ export const editVinyl = async (req, res, next) => {
       },
     );
     if (!newData) {
-      const error = new Error("找不到該黑膠唱片的 ID，無法編輯");
+      const e = new Error("找不到該黑膠唱片的 ID，無法編輯");
       e.status = 404;
-      return next(error);
+      return next(e);
     }
     res.status(200).json({ message: `updateData: ${newData}` });
   } catch (e) {
@@ -142,9 +144,9 @@ export const deleteVinyl = async (req, res, next) => {
     const { id } = req.params;
     const deleteData = await Vinyl.findByIdAndDelete(id);
     if (!deleteData) {
-      const error = new Error("找不到該黑膠唱片的 ID，無法刪除");
+      const e = new Error("找不到該黑膠唱片的 ID，無法刪除");
       e.status = 404;
-      return next(error);
+      return next(e);
     }
     res.status(200).json({ message: `deleteData: ${id}` });
   } catch (e) {

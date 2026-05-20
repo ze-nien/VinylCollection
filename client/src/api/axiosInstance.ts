@@ -38,7 +38,6 @@ api.interceptors.response.use(
         }
       }
       if (status === 403) {
-        console.log("403333333333333333");
         if (data?.message === "憑證異常，拒絕存取") {
           toast.error("憑證異常，拒絕存取");
           useAuthStore.getState().logout();
