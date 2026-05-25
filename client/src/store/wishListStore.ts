@@ -4,6 +4,20 @@ import { create } from "zustand";
 import type { WishList, WishListBase } from "../types/wishList";
 import type { VinylBase } from "../types/vinyl";
 
+//頁數定義
+interface Pagination {
+  total: number;
+  page: number;
+  pages: number;
+  limit: number;
+}
+
+//回傳資料定義
+interface FetchWishListResponse {
+  data: WishList[];
+  pagination: Pagination;
+}
+
 interface moveState {
   success: boolean;
   message: string | null;
@@ -12,23 +26,37 @@ interface moveState {
 
 interface WishListState {
   wishList: WishList[];
+  pagination: Pagination | null;
+  listData: WishList | null;
   error: string | null;
   isLoading: boolean;
-  fetchWishList: () => Promise<void>;
+  fetchWishList: (page?: number) => Promise<void>;
+  fetchWishListData: (id: string) => Promise<void>; //取得特定
   addWishListData: (newData: WishListBase) => Promise<void>;
-  updateWishList: (id: string) => Promise<void>;
+  moveToVinyl: (id: string) => Promise<void>;
+  updateWishList: (id: string, updateData: WishListBase) => Promise<void>;
   deleteWishListData: (id: string) => Promise<void>;
+  clearListData: () => void;
 }
 
 export const useWishListStore = create<WishListState>((set) => ({
   wishList: [],
+  pagination: null,
+  listData: null,
   error: null,
   isLoading: false,
-  fetchWishList: async () => {
+  fetchWishList: async (page = 1) => {
     set({ isLoading: true });
     try {
-      const res = await api.get<{ data: WishList[] }>(`/wishList`);
-      if (res?.data) set({ wishList: res.data.data, isLoading: false });
+      const res = await api.get<FetchWishListResponse>(
+        `/wishList?page=${page}`,
+      );
+      if (res?.data)
+        set({
+          wishList: res.data.data,
+          pagination: res.data.pagination,
+          isLoading: false,
+        });
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         const errorMessage =
@@ -38,16 +66,26 @@ export const useWishListStore = create<WishListState>((set) => ({
       throw e;
     }
   },
+  fetchWishListData: async (id) => {
+    set({ isLoading: true });
+    try {
+      const res = await api.get<WishList>(`/wishList/${id}`);
+      set({ listData: res.data, isLoading: false });
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        const errorMessage =
+          e.response?.data?.message || e.message || "發生未知錯誤";
+        set({ listData: null, isLoading: false, error: errorMessage });
+      }
+      throw e;
+    }
+  },
   addWishListData: async (newData) => {
     set({ isLoading: true });
     try {
       const res = await api.post<WishList>("/wishList", newData);
-      const savedData: WishList = {
-        ...newData,
-        _id: res.data._id,
-      };
       set((state) => ({
-        wishList: [savedData, ...state.wishList],
+        wishList: [res.data, ...state.wishList],
         isLoading: false,
       }));
     } catch (e: unknown) {
@@ -59,7 +97,26 @@ export const useWishListStore = create<WishListState>((set) => ({
       throw e;
     }
   },
-  updateWishList: async (id) => {
+  updateWishList: async (id, updateData) => {
+    set({ isLoading: true });
+    try {
+      const res = await api.patch<WishList>(`/wishList/${id}`, updateData);
+      set((state) => ({
+        wishList: state.wishList.map((data) =>
+          data._id === id ? { ...data, ...res.data } : data,
+        ),
+        isLoading: false,
+      }));
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        const errorMessage =
+          e.response?.data?.message || e.message || "發生未知錯誤";
+        set({ wishList: [], isLoading: false, error: errorMessage });
+      }
+      throw e;
+    }
+  },
+  moveToVinyl: async (id) => {
     set({ isLoading: true });
     try {
       const res = await api.post<moveState>(`/wishList/acquire/${id}`);
@@ -95,4 +152,5 @@ export const useWishListStore = create<WishListState>((set) => ({
       throw e;
     }
   },
+  clearListData: () => set({ listData: null, isLoading: false }),
 }));

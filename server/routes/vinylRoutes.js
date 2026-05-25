@@ -9,6 +9,7 @@ import {
   createVinylSchema,
   updateVinylSchema,
 } from "../schemas/vinyl.js";
+import { checkData } from "../middlewares/checkDataMiddleware.js";
 
 import {
   createVinyl,
@@ -24,6 +25,7 @@ router.post(
   parseUser,
   requireAdmin,
   validate(createVinylSchema),
+  checkData,
   createVinyl,
 );
 router.get("/:id", getVinyl);
@@ -32,6 +34,7 @@ router.patch(
   parseUser,
   requireAdmin,
   validate(updateVinylSchema),
+  checkData,
   editVinyl,
 );
 router.delete(

@@ -6,6 +6,19 @@ const errorHandler = (err, req, res, next) => {
   let message = err.message;
   console.log(`error${statusCode} message:${message}`);
 
+  if (err.code === 11000 || err.status === 409 || err.statusCode === 409) {
+    statusCode = 409;
+
+    if (err.code === 11000) {
+      const duplicateField = err.keyValue ? Object.keys(err.keyValue)[0] : "";
+      message = duplicateField
+        ? `此規格的資料已存在（重複的欄位：${duplicateField}）`
+        : "資料庫中已存在相同的資料，請勿重複新增";
+    } else {
+      message = err.message;
+    }
+  }
+
   //zod表單驗證錯誤
   if (err.name === "ZodError") {
     statusCode = 400;

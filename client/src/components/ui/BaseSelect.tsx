@@ -22,7 +22,7 @@ const BaseSelect = ({
     <div className="flex items-center mt-2">
       <label htmlFor={name}>{label}</label>
       <select
-        className="bg-primary md:bg-secondary border-none focus:ring-0 text-xs ml-1 py-1 pl-1"
+        className="bg-primary/90 md:bg-secondary border-none focus:ring-0 text-xs ml-1 py-1 pl-1"
         id={name}
         name={name}
         value={value}

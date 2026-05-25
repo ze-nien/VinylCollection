@@ -8,7 +8,9 @@ import VinylRouter from "./routes/vinylRoutes.js";
 import WishListRouter from "./routes/wishListRoutes.js";
 import errorHandler from "./middlewares/errorMiddleware.js";
 import cookieParser from "cookie-parser";
+
 import WishList from "./models/WishList.js";
+import Vinyl from "./models/Vinyl.js";
 
 dotenv.config();
 console.log(`伺服器運行模式：[${process.env.NODE_ENV}]`);
@@ -29,9 +31,34 @@ app.use(express.json());
 
 const mongoURI = process.env.MONGODB_URI;
 
+const migrateOldData = async () => {
+  try {
+    const vinylResult = await Vinyl.updateMany(
+      {
+        version: "",
+      },
+      { $set: { version: "Standard" } },
+    );
+    const wishResult = await WishList.updateMany(
+      {
+        version: { $exists: false },
+      },
+      { $set: { version: "" } },
+    );
+    console.log(
+      `成功更新vinyl${vinylResult.modifiedCount}筆 wish${wishResult.modifiedCount}筆`,
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 mongoose
   .connect(mongoURI)
-  .then(() => console.log("連接mongoDB.."))
+  .then(() => {
+    console.log("連接mongoDB..");
+    // migrateOldData();
+  })
   .catch((e) => console.error(e));
 
 app.use("/api/auth", AuthRouter);

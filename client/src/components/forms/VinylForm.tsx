@@ -13,6 +13,7 @@ import FormField from "./FormField";
 import StarRating from "./StarRating";
 import Modal from "../Modal";
 import toast from "react-hot-toast";
+import { checkVinylDuplicate } from "../../utils/checkData";
 
 const VinylForm = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const VinylForm = () => {
   const clearVinyl = useVinylStore((s) => s.clearVinyl);
   const fetchVinyl = useVinylStore((s) => s.fetchVinyl);
   const vinyl = useVinylStore((s) => s.vinyl);
+  const vinyls = useVinylStore((s) => s.vinyls);
   const { id } = useParams<{ id: string }>();
   const isEditMode = Boolean(id);
 
@@ -37,7 +39,8 @@ const VinylForm = () => {
       artist: "",
       genre: [],
       coverUrl: "",
-      year: undefined,
+      version: "Standard",
+      year: new Date().getFullYear(),
       albumRating: 1,
       notes: "",
     },
@@ -45,7 +48,6 @@ const VinylForm = () => {
     values: vinyl //偵測vinyl從undefined變成一筆黑膠唱片資料 自動調用reset()
       ? {
           ...vinyl,
-          year: vinyl.year ? Number(vinyl.year) : undefined,
           coverUrl: vinyl.coverUrl ? String(vinyl.coverUrl) : "",
           albumRating: vinyl.albumRating ? Number(vinyl.albumRating) : 1,
         }
@@ -61,19 +63,41 @@ const VinylForm = () => {
 
   const onSubmit: SubmitHandler<VinylBase> = async (data) => {
     try {
+      const checkResult = checkVinylDuplicate(id ?? null, data, vinyls);
+      if (checkResult.type === "ABSOLUTE_DUPLICATE") {
+        toast.error(
+          `《${data.album}》(${data.version || "Standard"}) 已經存在於收藏中！`,
+          {
+            style: {
+              borderRadius: "10px",
+              background: "#ff4b4b",
+              color: "#fff",
+            },
+          },
+        );
+        return;
+      }
       if (isEditMode && id) {
         await updateVinyl(id, data);
-
-        toast.success("編輯成功", {
-          style: {
-            borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
-          },
-        });
       } else {
         await addVinyl(data);
-        toast.success("新增成功");
+      }
+
+      // --- 根據檢查結果，跳出不同的成功/警告通知 (UX) ---
+      if (checkResult.type === "VERSION_DIFFERENT") {
+        toast(`儲存成功！已調整為不同版本。`, {
+          icon: "⚠️",
+          style: {
+            borderRadius: "10px",
+            background: "#fef3c7",
+            color: "#92400e",
+            border: "1px solid #f59e0b",
+          },
+          duration: 4000,
+        });
+      } else {
+        // SAFE 狀態
+        toast.success(isEditMode ? "編輯成功" : "新增成功");
       }
       navigate("/");
     } catch (e) {
@@ -88,8 +112,8 @@ const VinylForm = () => {
 
   //useBlocker在換頁時攔截 .state有unblocked未攔截、blocked攔截、proceeding換頁
   const blocker = useBlocker(() => {
-    //不是編輯模式、表單變動、submit未成功時攔截
-    return !isEditMode && isDirty && !isSubmitSuccessful && !isSubmitting;
+    //表單變動、submit未成功時攔截
+    return isDirty && !isSubmitSuccessful && !isSubmitting;
   });
 
   return (
@@ -106,7 +130,7 @@ const VinylForm = () => {
       </Modal>
 
       <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
-        <div className="p-2 grid grid-cols-2 gap-4 items-start">
+        <div className="p-2 grid grid-cols-1 gap-4 items-start">
           <FormField
             id="album"
             label="Album"
@@ -134,6 +158,13 @@ const VinylForm = () => {
               setValueAs: (value) => (value === "" ? 0 : Number(value)),
             })}
           />
+          <FormField
+            id="version"
+            label="Version"
+            tag="input"
+            error={errors.version?.message as string}
+            {...register("version")}
+          />
           {/* 
            不是input可以使用register 不具備原生ref、onChange
            因此使用Controller監控自訂組件狀態 同步回傳RHF 
@@ -145,7 +176,7 @@ const VinylForm = () => {
             control={control}
             name="albumRating"
             render={({ field }) => (
-              <div className="h-full flex gap-1 items-center justify-center">
+              <div className="h-full flex gap-1 items-center justify-around">
                 <span>Album Rating:</span>
                 <StarRating
                   value={field.value || 0}
@@ -154,7 +185,7 @@ const VinylForm = () => {
               </div>
             )}
           />
-          <div className="col-span-2">
+          <div className="">
             <FormField
               id="genre"
               label="Genre"
@@ -164,16 +195,18 @@ const VinylForm = () => {
               {...register("genre")}
             />
           </div>
-          <div className="col-span-2">
+          <div className="">
             <FormField
               id="notes"
               label="Notes"
               tag="textarea"
+              maxLength={100}
+              defaultValue={vinyl ? vinyl.notes : ""}
               error={errors.notes?.message as string}
               {...register("notes")}
             />
           </div>
-          <div className="col-span-2 text-center mb-2">
+          <div className=" text-center mb-2">
             <button type="submit">submit</button>
           </div>
         </div>

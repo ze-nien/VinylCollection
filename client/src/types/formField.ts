@@ -10,6 +10,9 @@ export interface BaseProps {
   label: string;
   error?: string;
   id: string;
+  name?: string;
+  maxLength?: number;
+  defaultValue?: string | number;
 }
 type FormFieldInputProps = BaseProps & {
   tag: "input";

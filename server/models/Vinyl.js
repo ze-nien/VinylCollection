@@ -6,12 +6,13 @@ const VinylSchema = new mongoose.Schema(
     album: { type: String, required: true },
     artist: { type: String, required: true },
     genre: [{ type: String, enum: GENRES }],
+    version: { type: String, default: "Standard" },
+    year: { type: String, required: true },
     coverUrl: String,
-    year: String,
     albumRating: Number,
     notes: {
       type: String,
-      maxlength: [200, "備註內容不能超過 200 個字"], // 自訂錯誤訊息
+      maxlength: [100, "備註內容不能超過 100 個字"], // 自訂錯誤訊息
       trim: true, //前後空格
     },
   },

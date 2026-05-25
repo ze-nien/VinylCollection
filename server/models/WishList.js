@@ -6,10 +6,13 @@ const WishListSchema = new mongoose.Schema(
     artist: { type: String, required: true },
     notes: {
       type: String,
-      maxlength: [200, "備註內容不能超過 200 個字"], // 自訂資料庫錯誤訊息
+      maxlength: [100, "備註內容不能超過 100 個字"], // 自訂資料庫錯誤訊息
       trim: true, // 前後空格
     },
     isAcquired: { type: Boolean, default: false },
+    version: { type: String, default: "" },
+    year: { type: String, required: true },
+    coverUrl: String,
   },
   { timestamps: true },
 );

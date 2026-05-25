@@ -127,12 +127,8 @@ export const useVinylStore = create<VinylState>((set, get) => ({
     set({ isLoading: true });
     try {
       const res = await api.post<Vinyl>(`/vinyls`, newVinyl);
-      const savedVinyl: Vinyl = {
-        ...newVinyl,
-        _id: res.data._id,
-      };
       set((state) => ({
-        vinyls: [savedVinyl, ...state.vinyls],
+        vinyls: [res.data, ...state.vinyls],
         isLoading: false,
       }));
     } catch (e: unknown) {

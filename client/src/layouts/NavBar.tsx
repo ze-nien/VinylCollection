@@ -20,7 +20,7 @@ const NavBar = () => {
   `;
 
   return (
-    <div className="sticky top-0 z-50 h-16 bg-primary p-4 flex justify-between items-center">
+    <div className="sticky top-0 z-50 h-16 bg-primary p-2 flex justify-between items-center">
       <div className="flex gap-3">
         {visibleNavItems.map((item) => {
           if (item.path === "/auth/login") return null;

@@ -69,9 +69,8 @@ export const getAllVinyls = async (req, res, next) => {
 //新增資料POST('api/vinyls')
 export const createVinyl = async (req, res, next) => {
   try {
-    const { album, artist, genre, year, albumRating, notes } = req.body;
-    // console.log(req.body);
-
+    const { album, artist, genre, year, albumRating, notes, version } =
+      req.body;
     const fetchCoverUrl = await fetchAlbumCover(artist, album);
     const coverUrl =
       fetchCoverUrl === "none" ? "/images/DEFAULT.jpg" : fetchCoverUrl;
@@ -83,6 +82,7 @@ export const createVinyl = async (req, res, next) => {
       year,
       albumRating,
       notes,
+      version,
     });
     res.status(200).json(newVinyl);
   } catch (e) {

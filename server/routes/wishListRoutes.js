@@ -1,21 +1,51 @@
 import express from "express";
 const router = express.Router();
 
+import { parseUser, requireAdmin } from "../middlewares/authMiddleware.js";
 import validate from "../middlewares/validateMiddleware.js";
 import {
   createWishListSchema,
-  deleteWishListSchema,
+  updateWishListSchema,
+  checkIdSchema,
 } from "../schemas/wishList.js";
 
 import {
-  createWishListData,
-  deleteWishListData,
-  updateWishListDataStatus,
   getWishList,
+  getWishListData,
+  createWishListData,
+  updateWishListData,
+  deleteWishListData,
+  moveToVinyl,
 } from "../controllers/wishListController.js";
 
 router.get("/", getWishList);
-router.post("/", validate(createWishListSchema), createWishListData);
-router.delete("/:id", validate(deleteWishListSchema), deleteWishListData);
-router.post("/acquire/:id", updateWishListDataStatus);
+router.post(
+  "/",
+  parseUser,
+  requireAdmin,
+  validate(createWishListSchema),
+  createWishListData,
+);
+router.get(
+  "/:id",
+  parseUser,
+  requireAdmin,
+  validate(checkIdSchema),
+  getWishListData,
+);
+router.patch(
+  "/:id",
+  parseUser,
+  requireAdmin,
+  validate(updateWishListSchema),
+  updateWishListData,
+);
+router.delete(
+  "/:id",
+  parseUser,
+  requireAdmin,
+  validate(checkIdSchema),
+  deleteWishListData,
+);
+router.post("/acquire/:id", parseUser, requireAdmin, moveToVinyl);
 export default router;
