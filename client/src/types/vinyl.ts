@@ -1,13 +1,13 @@
 import { z } from "zod";
-import { GENRES } from "../../../shared/constants";
+import { GENRES } from "./constants";
 
 //資料規格
 export const vinylSchema = z.object({
   album: z.string().min(1, "專輯名稱必填").max(200, "專輯名稱不能超過200字"),
   artist: z.string().min(1, "演出者必填").max(100, "演出者不能超過100字"),
-  genre: z.array(z.enum(GENRES)).default([]),
+  genre: z.array(z.enum([...GENRES] as [string, ...string[]])).optional(),
   coverUrl: z.string().optional(),
-  version: z.string().max(50, "版本不能超過50字").default("Standard"),
+  version: z.string().max(50, "版本不能超過50字").optional(),
   year: z
     .number()
     .min(1950, "不早於1950年")

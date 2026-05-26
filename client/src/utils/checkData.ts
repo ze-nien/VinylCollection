@@ -2,7 +2,7 @@ export interface ICoverableVinyl {
   _id?: string;
   album: string;
   artist: string;
-  version: string;
+  version?: string;
 }
 
 export type CheckDuplicateResult =

@@ -74,6 +74,7 @@ export const createVinyl = async (req, res, next) => {
     const fetchCoverUrl = await fetchAlbumCover(artist, album);
     const coverUrl =
       fetchCoverUrl === "none" ? "/images/DEFAULT.jpg" : fetchCoverUrl;
+    const finalVersion = version === "" ? "Standard" : version;
     const newVinyl = await Vinyl.create({
       album,
       artist,
@@ -82,7 +83,7 @@ export const createVinyl = async (req, res, next) => {
       year,
       albumRating,
       notes,
-      version,
+      version: finalVersion,
     });
     res.status(200).json(newVinyl);
   } catch (e) {

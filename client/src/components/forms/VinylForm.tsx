@@ -5,8 +5,8 @@ import { useBlocker, useNavigate, useParams } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { VinylBase } from "../../types/vinyl";
-import { vinylSchema } from "../../../../shared/vinylSchema";
-import { GENRES } from "../../../../shared/constants";
+import { vinylSchema } from "../../types/vinyl";
+import { GENRES } from "../../types/constants";
 import { useVinylStore } from "../../store/vinylStore";
 
 import FormField from "./FormField";
