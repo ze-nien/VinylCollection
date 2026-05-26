@@ -2,7 +2,7 @@ import FormField from "./FormField";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { WishListBase } from "../../types/wishList";
-import { wishListSchema } from "../../../../shared/wishListSchema";
+import { wishListSchema } from "../../types/wishList";
 import { useWishListStore } from "../../store/wishListStore";
 import { useEffect, useState } from "react";
 import { useBlocker } from "react-router";
