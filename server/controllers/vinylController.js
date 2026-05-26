@@ -1,10 +1,10 @@
 import axios from "axios";
 import Vinyl from "../models/Vinyl.js";
 import { fetchAlbumCover } from "../services/lastFmService.js";
+import { getAllVinylsSchema } from "../schemas/vinyl.js";
 
 //所有資料GET('api/vinyls')
 export const getAllVinyls = async (req, res, next) => {
-  console.log(req);
   try {
     const {
       page = 1,
@@ -13,11 +13,24 @@ export const getAllVinyls = async (req, res, next) => {
       genre,
       yearRange,
       minAlbumRating,
-    } = req.query;
+    } = getAllVinylsSchema.shape.query.parse(req.query);
 
     const skip = (Number(page) - 1) * Number(limit); //跳過資料數
     let query = {}; //初始化查詢物件
-    if (genre) query.genre = { $in: genre.split(",") }; // $in包含(mongoDB語法)
+    // $in包含(mongoDB語法)
+    if (genre) {
+      const genreArray = genre.split(",");
+      if (genreArray.includes("uncategorized")) {
+        query.$or = [
+          //過濾uncategorized名稱的假類別(genre沒有此類別)
+          { genre: { $in: genreArray.filter((g) => g !== "uncategorized") } },
+          //加入uncategorized的類別(沒有設定genre的空字串)
+          { genre: { $size: 0 } },
+        ];
+      } else {
+        query.genre = { $in: genre.split(",") };
+      }
+    }
     // $gte大於等於 $lte小於等於 (mongoDB語法)
     if (yearRange && yearRange.endsWith("s") && yearRange !== "All") {
       const decade = parseInt(yearRange);
@@ -34,6 +47,7 @@ export const getAllVinyls = async (req, res, next) => {
     if (sort === "asc") sortOrder = { artist: 1 };
     if (sort === "desc") sortOrder = { artist: -1 };
 
+    //兩個對資料庫的請求，同時（並行）發送出去->使用 Promise.all
     const [vinyls, total] = await Promise.all([
       Vinyl.find(query).sort(sortOrder).skip(skip).limit(limit),
       Vinyl.countDocuments(query),
@@ -55,9 +69,8 @@ export const getAllVinyls = async (req, res, next) => {
 //新增資料POST('api/vinyls')
 export const createVinyl = async (req, res, next) => {
   try {
-    const { album, artist, genre, year, albumRating, notes } = req.body;
-    // console.log(req.body);
-
+    const { album, artist, genre, year, albumRating, notes, version } =
+      req.body;
     const fetchCoverUrl = await fetchAlbumCover(artist, album);
     const coverUrl =
       fetchCoverUrl === "none" ? "/images/DEFAULT.jpg" : fetchCoverUrl;
@@ -69,6 +82,7 @@ export const createVinyl = async (req, res, next) => {
       year,
       albumRating,
       notes,
+      version,
     });
     res.status(200).json(newVinyl);
   } catch (e) {
@@ -86,9 +100,9 @@ export const getVinyl = async (req, res, next) => {
       res.status(200).json(vinyl);
     } else {
       {
-        const error = new Error("找不到該黑膠唱片的 ID");
-        res.statusCode = 404;
-        return next(error);
+        const e = new Error("找不到該黑膠唱片的 ID");
+        e.status = 404;
+        return next(e);
       }
     }
   } catch (e) {
@@ -114,9 +128,9 @@ export const editVinyl = async (req, res, next) => {
       },
     );
     if (!newData) {
-      const error = new Error("找不到該黑膠唱片的 ID，無法編輯");
-      res.statusCode = 404;
-      return next(error);
+      const e = new Error("找不到該黑膠唱片的 ID，無法編輯");
+      e.status = 404;
+      return next(e);
     }
     res.status(200).json({ message: `updateData: ${newData}` });
   } catch (e) {
@@ -130,9 +144,9 @@ export const deleteVinyl = async (req, res, next) => {
     const { id } = req.params;
     const deleteData = await Vinyl.findByIdAndDelete(id);
     if (!deleteData) {
-      const error = new Error("找不到該黑膠唱片的 ID，無法刪除");
-      res.statusCode = 404;
-      return next(error);
+      const e = new Error("找不到該黑膠唱片的 ID，無法刪除");
+      e.status = 404;
+      return next(e);
     }
     res.status(200).json({ message: `deleteData: ${id}` });
   } catch (e) {

@@ -1,6 +1,6 @@
 import type { FormFieldProps } from "../../types/formField";
 import CheckBox from "./CheckBox";
-import FieldWrapper from "./FieldWrapper";
+import FieldWrapper from "../FieldWrapper";
 import Input from "./Input";
 import TextArea from "./TextArea";
 

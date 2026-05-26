@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "../api/axiosInstance";
 import { create } from "zustand";
 import type { Vinyl, VinylBase } from "../types/vinyl";
 
@@ -49,8 +50,6 @@ interface VinylState {
   clearVinyl: () => void; //清除
 }
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
 export const useVinylStore = create<VinylState>((set, get) => ({
   vinyls: [],
   pagination: null,
@@ -74,8 +73,8 @@ export const useVinylStore = create<VinylState>((set, get) => ({
     get().fetchVinyls(1);
   },
   fetchVinyls: async (page = 1) => {
+    set({ isLoading: true });
     try {
-      set({ isLoading: true });
       const { filters } = get();
       const params = new URLSearchParams({
         page: page.toString(),
@@ -86,29 +85,34 @@ export const useVinylStore = create<VinylState>((set, get) => ({
         minAlbumRating: filters.albumRating?.toString() || "",
       });
       // await new Promise((r) => setTimeout(r, 1000)); //模擬載入一秒
-      const res = await axios.get<FetchVinylsResponse>(
-        `${API_URL}/api/vinyls?${params}`,
-      );
-      if (res)
+      const res = await api.get<FetchVinylsResponse>(`/vinyls?${params}`);
+      if (res?.data)
         set({
           vinyls: res.data.data,
           pagination: res.data.pagination,
           isLoading: false,
         });
     } catch (e: unknown) {
+      let errorMessage = "發生未知錯誤";
       if (axios.isAxiosError(e)) {
-        const errorMessage =
-          e.response?.data?.message || e.message || "發生未知錯誤";
-
-        set({ vinyls: [], isLoading: false, error: errorMessage });
+        //後端寫好的message->Axios錯誤訊息
+        errorMessage = e.response?.data?.message || e.message || "讀取黑膠失敗";
+      } else if (e instanceof Error) {
+        //一般JS錯誤
+        errorMessage = e.message;
       }
+      set({
+        vinyls: [], // 發生錯誤時清空列表，或保留舊資料，視你的 UI 設計而定
+        isLoading: false,
+        error: errorMessage,
+      });
+      throw e;
     }
   },
-
   fetchVinyl: async (id) => {
+    set({ isLoading: true });
     try {
-      set({ isLoading: true });
-      const res = await axios.get<Vinyl>(`${API_URL}/api/vinyls/${id}`);
+      const res = await api.get<Vinyl>(`/vinyls/${id}`);
       set({ vinyl: res.data, isLoading: false });
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
@@ -116,19 +120,15 @@ export const useVinylStore = create<VinylState>((set, get) => ({
           e.response?.data?.message || e.message || "發生未知錯誤";
         set({ vinyl: null, isLoading: false, error: errorMessage });
       }
+      throw e;
     }
   },
   addVinyl: async (newVinyl) => {
     set({ isLoading: true });
     try {
-      const res = await axios.post<Vinyl>(`${API_URL}/api/vinyls`, newVinyl);
-      console.log(newVinyl);
-      const savedVinyl: Vinyl = {
-        ...newVinyl,
-        _id: res.data._id,
-      };
+      const res = await api.post<Vinyl>(`/vinyls`, newVinyl);
       set((state) => ({
-        vinyls: [savedVinyl, ...state.vinyls],
+        vinyls: [res.data, ...state.vinyls],
         isLoading: false,
       }));
     } catch (e: unknown) {
@@ -137,15 +137,13 @@ export const useVinylStore = create<VinylState>((set, get) => ({
           e.response?.data?.message || e.message || "發生未知錯誤";
         set({ isLoading: false, error: errorMessage });
       }
+      throw e;
     }
   },
   updateVinyl: async (id, updatedVinyl) => {
     set({ isLoading: true });
     try {
-      const res = await axios.patch<Vinyl>(
-        `${API_URL}/api/vinyls/${id}`,
-        updatedVinyl,
-      );
+      const res = await api.patch<Vinyl>(`/vinyls/${id}`, updatedVinyl);
       set((state) => ({
         vinyls: state.vinyls.map((vinyl) =>
           vinyl._id === id ? { ...vinyl, ...res.data } : vinyl,
@@ -158,20 +156,24 @@ export const useVinylStore = create<VinylState>((set, get) => ({
           e.response?.data?.message || e.message || "發生未知錯誤";
         set({ isLoading: false, error: errorMessage });
       }
+      throw e;
     }
   },
   deleteVinyl: async (id) => {
+    set({ isLoading: true });
     try {
-      await axios.delete<Vinyl>(`${API_URL}/api/vinyls/${id}`);
+      await api.delete<Vinyl>(`/vinyls/${id}`);
       set((state) => ({
         vinyls: state.vinyls.filter((vinyl) => vinyl._id !== id),
+        isLoading: false,
       }));
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         const errorMessage =
           e.response?.data?.message || e.message || "發生未知錯誤";
-        set({ error: errorMessage });
+        set({ isLoading: false, error: errorMessage });
       }
+      throw e;
     }
   },
   clearVinyl: () => set({ vinyl: null, isLoading: false }),

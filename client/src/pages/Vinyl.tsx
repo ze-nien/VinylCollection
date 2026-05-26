@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import VinylCard from "../components/VinylCard";
 import { useVinylStore } from "../store/vinylStore";
-import Spinner from "../components/forms/Spinner";
+import Spinner from "../components/ui/Spinner";
+import Pagination from "../components/Pagination";
 
 const Vinyl = () => {
   const vinyls = useVinylStore((s) => s.vinyls);
@@ -18,35 +19,26 @@ const Vinyl = () => {
   };
 
   return (
-    <div className="max-w-screen mx-auto">
+    <div className="max-w-screen mx-auto py-5">
       {isLoading ? (
         <Spinner />
       ) : vinyls.length > 0 ? (
         <div>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
+          <div
+            className="grid grid-cols-1 
+          md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 
+          gap-8 justify-items-center"
+          >
             {vinyls.map((vinyl) => (
               <VinylCard key={vinyl._id} vinyl={vinyl} />
             ))}
           </div>
           {pagination && (
-            <div className="flex justify-center items-center gap-4 mt-8">
-              {Array.from({ length: pagination.pages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    disabled={pagination.page === page}
-                    className={`px-3 py-2 rounded-md bg-transparent ${
-                      pagination.page === page
-                        ? "text-primary"
-                        : "bg-gray-200 text-gray-500 hover:cursor-pointer hover:text-white transition"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ),
-              )}
-            </div>
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              onPageChange={handlePageChange}
+            />
           )}
         </div>
       ) : (

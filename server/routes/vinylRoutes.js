@@ -1,6 +1,16 @@
 import express from "express";
 const router = express.Router();
 
+import { parseUser, requireAdmin } from "../middlewares/authMiddleware.js";
+
+import validate from "../middlewares/validateMiddleware.js";
+import {
+  checkIdSchema,
+  createVinylSchema,
+  updateVinylSchema,
+} from "../schemas/vinyl.js";
+import { checkData } from "../middlewares/checkDataMiddleware.js";
+
 import {
   createVinyl,
   deleteVinyl,
@@ -9,16 +19,30 @@ import {
   getVinyl,
 } from "../controllers/vinylController.js";
 
-import {
-  checkIdSchema,
-  createVinylSchema,
-  updateVinylSchema,
-} from "../schemas/vinyl.js";
-import validate from "../middlewares/validateMiddleware.js";
-
 router.get("/", getAllVinyls);
-router.post("/", validate(createVinylSchema), createVinyl);
+router.post(
+  "/",
+  parseUser,
+  requireAdmin,
+  validate(createVinylSchema),
+  checkData,
+  createVinyl,
+);
 router.get("/:id", getVinyl);
-router.patch("/:id", validate(updateVinylSchema), editVinyl);
-router.delete("/:id", validate(checkIdSchema), deleteVinyl);
+router.patch(
+  "/:id",
+  parseUser,
+  requireAdmin,
+  validate(updateVinylSchema),
+  checkData,
+  editVinyl,
+);
+router.delete(
+  "/:id",
+  parseUser,
+  requireAdmin,
+  validate(checkIdSchema),
+  deleteVinyl,
+);
+
 export default router;
