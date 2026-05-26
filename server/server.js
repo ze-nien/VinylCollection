@@ -29,7 +29,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
-const mongoURI = process.env.MONGODB_URI;
+const mongoURI = process.env.MONGODB_URI_ATLAS;
 
 const migrateOldData = async () => {
   try {
