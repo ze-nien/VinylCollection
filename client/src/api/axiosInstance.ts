@@ -4,7 +4,7 @@ import { useAuthStore } from "../store/authStore";
 
 //建立axios實例
 const api = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: "https://vinylcollection.onrender.com/api",
   timeout: 10000, //發送請求超過10秒視為請求失敗
   withCredentials: true, //允許跨域請求攜帶並寫入Cookie
 });

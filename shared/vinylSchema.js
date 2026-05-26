@@ -5,7 +5,7 @@ import { GENRES } from "./constants.js";
 export const vinylSchema = z.object({
   album: z.string().min(1, "專輯名稱必填").max(200, "專輯名稱不能超過200字"),
   artist: z.string().min(1, "演出者必填").max(100, "演出者不能超過100字"),
-  genre: z.array(z.enum(GENRES)).optional(),
+  genre: z.array(z.enum(GENRES)).default([]),
   coverUrl: z.string().optional(),
   version: z.string().max(50, "版本不能超過50字").default("Standard"),
   year: z

@@ -56,8 +56,8 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
 
       {/* 分類 */}
       <div className="flex flex-wrap gap-1">
-        {vinyl.genre && vinyl.genre.length > 0
-          ? vinyl.genre.map((g) => (
+        {Array.isArray(vinyl.genre) && vinyl.genre.length > 0
+          ? (vinyl.genre as string[]).map((g) => (
               <span
                 key={g}
                 className="text-xs bg-primary text-secondary px-2 py-0.5 rounded-full border"

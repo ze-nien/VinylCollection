@@ -5,7 +5,7 @@ const VinylSchema = new mongoose.Schema(
   {
     album: { type: String, required: true },
     artist: { type: String, required: true },
-    genre: [{ type: String, enum: GENRES }],
+    genre: { type: [String], enum: GENRES, default: [] },
     version: { type: String, default: "Standard" },
     year: { type: String, required: true },
     coverUrl: String,
