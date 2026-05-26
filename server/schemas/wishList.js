@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { wishListSchema } from "../../shared/wishListSchema.js";
+import { wishListSchema } from "../types/wishListSchema.js";
 
 //新增
 export const createWishListSchema = z.object({

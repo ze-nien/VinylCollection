@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { GENRES } from "../../shared/constants.js";
+import { GENRES } from "../types/constants.js";
 
 const VinylSchema = new mongoose.Schema(
   {

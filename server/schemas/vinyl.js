@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { vinylSchema } from "../../shared/vinylSchema.js";
+import { vinylSchema } from "../types/vinylSchema.js";
 
 export const createVinylSchema = z.object({
   body: vinylSchema,

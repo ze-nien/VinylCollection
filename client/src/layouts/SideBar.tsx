@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router";
-import { GENRES } from "../../../shared/constants";
+import { GENRES } from "../../../server/types/constants";
 import { useVinylStore } from "../store/vinylStore";
 import BaseSelect from "../components/ui/BaseSelect";
 import BaseRadio from "../components/ui/BaseRadio";
