@@ -10,7 +10,7 @@ import Modal from "../Modal";
 import toast from "react-hot-toast";
 import { checkVinylDuplicate } from "../../utils/checkData";
 
-const WishLIstForm = () => {
+const WishListForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const addWishListData = useWishListStore((s) => s.addWishListData);
   const updateWishList = useWishListStore((s) => s.updateWishList);
@@ -215,4 +215,4 @@ const WishLIstForm = () => {
   );
 };
 
-export default WishLIstForm;
+export default WishListForm;

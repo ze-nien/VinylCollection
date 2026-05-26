@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
 import { useWishListStore } from "../store/wishListStore";
 import Spinner from "../components/ui/Spinner";
-import WishLIstForm from "../components/forms/WishLIstForm";
+import WishListForm from "../components/forms/WishListForm";
 import WishListCard from "../components/WishListCard";
 import Pagination from "../components/Pagination";
 
@@ -25,7 +25,7 @@ const WishList = () => {
   return (
     <div className="flex flex-col">
       {/* 新增 */}
-      {isAuthenticated && <WishLIstForm />}
+      {isAuthenticated && <WishListForm />}
       {/* 現有 */}
       {isLoading && <Spinner />}
       <div className="flex flex-col px-5 w-full gap-3 py-5">
