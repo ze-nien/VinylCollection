@@ -1,5 +1,4 @@
 import { z } from "zod";
-// import { wishListSchema } from "../../../shared/wishListSchema";
 
 export const wishListSchema = z.object({
   album: z.string().min(1, "專輯名稱必填").max(200, "專輯名稱不能超過200字"),
