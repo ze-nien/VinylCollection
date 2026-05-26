@@ -188,9 +188,11 @@ const WishLIstForm = () => {
           </div>
           <div className="flex justify-center md:col-span-4 md:row-start-3 w-full">
             <button
+              disabled={isSubmitting}
               type="submit"
-              className="text-primary bg-secondary px-2
-      hover:cursor-pointer hover:bg-primary hover:text-secondary transition"
+              className="text-primary bg-secondary px-2 transition
+      hover:cursor-pointer hover:bg-primary hover:text-secondary
+       disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {listData ? "Submit" : "Add"}
             </button>

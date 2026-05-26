@@ -40,7 +40,7 @@ const VinylForm = () => {
       genre: [],
       coverUrl: "",
       version: "Standard",
-      year: new Date().getFullYear(),
+      year: undefined,
       albumRating: 1,
       notes: "",
     },
@@ -48,6 +48,7 @@ const VinylForm = () => {
     values: vinyl //偵測vinyl從undefined變成一筆黑膠唱片資料 自動調用reset()
       ? {
           ...vinyl,
+          year: Number(vinyl.year),
           coverUrl: vinyl.coverUrl ? String(vinyl.coverUrl) : "",
           albumRating: vinyl.albumRating ? Number(vinyl.albumRating) : 1,
         }
@@ -155,7 +156,7 @@ const VinylForm = () => {
             suppressHydrationWarning //忽略此處的伺服器與客戶端時間差
             error={errors.year?.message as string}
             {...register("year", {
-              setValueAs: (value) => (value === "" ? 0 : Number(value)),
+              valueAsNumber: true,
             })}
           />
           <FormField
@@ -207,7 +208,13 @@ const VinylForm = () => {
             />
           </div>
           <div className=" text-center mb-2">
-            <button type="submit">submit</button>
+            <button
+              className="disabled:opacity-50 disabled:cursor-not-allowed"
+              type="submit"
+              disabled={isSubmitting}
+            >
+              submit
+            </button>
           </div>
         </div>
       </form>

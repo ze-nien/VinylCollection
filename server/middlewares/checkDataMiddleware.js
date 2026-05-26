@@ -1,5 +1,10 @@
 import Vinyl from "../models/Vinyl.js";
 
+const escapeRegex = (string) => {
+  if (!string) return ""; // 防禦性防呆
+  return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+};
+
 export const checkData = async (req, res, next) => {
   try {
     const { id } = req.params; // 如果是 PATCH 會有 id，POST 則是 undefined

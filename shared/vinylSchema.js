@@ -11,8 +11,7 @@ export const vinylSchema = z.object({
   year: z
     .number()
     .min(1950, "不早於1950年")
-    .max(new Date().getFullYear(), "不超過今年")
-    .transform((val) => val.toString()),
+    .max(new Date().getFullYear(), "不超過今年"),
   albumRating: z.number().min(1, "最少一顆星").max(5),
   notes: z.string().max(100, "備註不能超過 100 個字").optional(),
 });
