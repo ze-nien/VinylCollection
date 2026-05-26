@@ -15,10 +15,25 @@ import Vinyl from "./models/Vinyl.js";
 dotenv.config();
 console.log(`伺服器運行模式：[${process.env.NODE_ENV}]`);
 const app = express();
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://vinyl-collection-liard.vercel.app",
+];
+
 app.use(
   cors({
     //指定前端網址
-    origin: "http://localhost:5173",
+    origin: function (origin, callback) {
+      // 允許沒有 origin 的請求（例如本地 Postman 測試、行動裝置 App 等）
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS 策略不允許此網域存取"));
+      }
+    },
     //允許前端跨域攜帶 Cookie / 憑證
     credentials: true,
     //允許常見的 HTTP 方法與 Headers
