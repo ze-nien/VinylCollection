@@ -17,6 +17,7 @@ import {
   editVinyl,
   getAllVinyls,
   getVinyl,
+  fetchStats,
 } from "../controllers/vinylController.js";
 
 router.get("/", getAllVinyls);
@@ -28,6 +29,7 @@ router.post(
   checkData,
   createVinyl,
 );
+router.get("/stats", fetchStats);
 router.get("/:id", getVinyl);
 router.patch(
   "/:id",

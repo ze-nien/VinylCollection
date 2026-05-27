@@ -1,14 +1,14 @@
-import FormField from "./FormField";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { WishListBase } from "../../types/wishList";
-import { wishListSchema } from "../../types/wishList";
-import { useWishListStore } from "../../store/wishListStore";
 import { useEffect, useState } from "react";
 import { useBlocker } from "react-router";
-import Modal from "../Modal";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
+import { wishListSchema } from "../../types/wishList";
+import type { WishListBase } from "../../types/wishList";
+import { useWishListStore } from "../../store/wishListStore";
 import { checkVinylDuplicate } from "../../utils/checkData";
+import Modal from "../Modal";
+import FormField from "./FormField";
 
 const WishListForm = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -84,6 +84,7 @@ const WishListForm = () => {
       } else {
         await addWishListData(data);
       }
+
       // --- 根據檢查結果，跳出不同的成功/警告通知 (UX) ---
       if (checkResult.type === "VERSION_DIFFERENT") {
         toast(`儲存成功！已調整為不同版本。`, {
@@ -102,6 +103,7 @@ const WishListForm = () => {
       }
       reset();
       clearListData();
+      useWishListStore.getState().fetchWishList(1);
     } catch (e) {
       console.error("提交黑膠表單時發生權限或阻斷錯誤：", e);
     }

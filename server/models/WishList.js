@@ -13,6 +13,7 @@ const WishListSchema = new mongoose.Schema(
     version: { type: String, default: "" },
     year: { type: String, required: true },
     coverUrl: String,
+    coverSource: String,
   },
   { timestamps: true },
 );

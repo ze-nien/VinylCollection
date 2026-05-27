@@ -16,6 +16,7 @@ import {
   updateWishListData,
   deleteWishListData,
   moveToVinyl,
+  fetchStatsWL,
 } from "../controllers/wishListController.js";
 
 router.get("/", getWishList);
@@ -26,6 +27,7 @@ router.post(
   validate(createWishListSchema),
   createWishListData,
 );
+router.get("/stats", fetchStatsWL);
 router.get(
   "/:id",
   parseUser,

@@ -1,10 +1,11 @@
+import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
+import toast from "react-hot-toast";
+
 import api from "../api/axiosInstance";
 import { useAuthStore } from "../store/authStore";
-import toast from "react-hot-toast";
-import { useEffect } from "react";
 
 interface LoginFormInput {
   userName: string;
@@ -53,7 +54,7 @@ const Login = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col items-center gap-2 "
+      className="flex flex-col items-center gap-2 mt-5"
     >
       <div className="flex flex-col items-end h-16">
         <div className="flex items-center gap-2">

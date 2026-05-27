@@ -1,6 +1,7 @@
 import axios from "axios";
 import WishList from "../models/WishList.js";
 import Vinyl from "../models/Vinyl.js";
+import { GENRES } from "../types/constants.js";
 import { fetchAlbumCover } from "../services/lastFmService.js";
 import { getWishListSchema } from "../schemas/wishList.js";
 
@@ -53,17 +54,22 @@ export const getWishListData = async (req, res, next) => {
 export const createWishListData = async (req, res, next) => {
   try {
     const { album, artist, notes, isAcquired, year, version } = req.body;
-    const fetchCoverUrl = await fetchAlbumCover(artist, album);
+    const { imageUrl: fetchCoverUrl, sourceUrl: fetchCoverSource } =
+      await fetchAlbumCover(artist, album);
+    console.log(fetchCoverUrl, fetchCoverSource);
     const coverUrl =
       fetchCoverUrl === "none" ? "/images/DEFAULT.jpg" : fetchCoverUrl;
+    const coverSource = fetchCoverSource || "";
+    const finalVersion = version === "" ? "Standard" : version;
     const newWishListData = await WishList.create({
       album,
       artist,
       notes,
       isAcquired,
-      version,
+      version: finalVersion,
       year,
       coverUrl,
+      coverSource,
     });
     res.status(200).json(newWishListData);
   } catch (e) {
@@ -140,6 +146,71 @@ export const deleteWishListData = async (req, res, next) => {
       return next(e);
     }
     res.status(200).json({ message: `deleteData: ${id}` });
+  } catch (e) {
+    next(e);
+  }
+};
+
+//統計
+export const fetchStatsWL = async (req, res, next) => {
+  try {
+    const total = await WishList.countDocuments();
+    const genreDistribution = await WishList.aggregate([
+      { $unwind: "$genre" },
+      { $match: { genre: { $in: GENRES } } },
+      {
+        $group: {
+          _id: "$genre",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          genreName: "$_id",
+          count: 1,
+        },
+      },
+    ]);
+
+    const eraDistribution = await WishList.aggregate([
+      {
+        $project: {
+          era: {
+            $concat: [
+              {
+                $toString: {
+                  $multiply: [
+                    { $floor: { $divide: [{ $toInt: "$year" }, 10] } },
+                    10,
+                  ],
+                },
+              },
+              "s",
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$era",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          era: "$_id",
+          count: 1,
+        },
+      },
+      { $sort: { era: 1 } }, // 按年代順序排序 (1970s -> 1980s)
+    ]);
+    res.json({
+      total,
+      genreDistribution,
+      eraDistribution,
+    });
   } catch (e) {
     next(e);
   }

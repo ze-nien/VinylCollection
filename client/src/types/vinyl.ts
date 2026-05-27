@@ -7,6 +7,7 @@ export const vinylSchema = z.object({
   artist: z.string().min(1, "演出者必填").max(100, "演出者不能超過100字"),
   genre: z.array(z.enum([...GENRES] as [string, ...string[]])).optional(),
   coverUrl: z.string().optional(),
+  coverSource: z.string().optional(),
   version: z.string().max(50, "版本不能超過50字").optional(),
   year: z
     .number()

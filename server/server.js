@@ -11,13 +11,15 @@ import cookieParser from "cookie-parser";
 
 import WishList from "./models/WishList.js";
 import Vinyl from "./models/Vinyl.js";
+import { fetchAlbumCover } from "./services/lastFmService.js";
+import { fetchStats } from "./controllers/vinylController.js";
 
 dotenv.config();
 console.log(`伺服器運行模式：[${process.env.NODE_ENV}]`);
 const app = express();
 
 const allowedOrigins = [
-  "http://localhost:5173",
+  // "http://localhost:5173",
   "https://vinyl-collection-liard.vercel.app",
 ];
 
@@ -45,24 +47,28 @@ app.use(cookieParser());
 app.use(express.json());
 
 const mongoURI = process.env.MONGODB_URI_ATLAS;
+// const mongoURI = process.env.MONGODB_URI;
 
 const migrateOldData = async () => {
   try {
-    const vinylResult = await Vinyl.updateMany(
-      {
-        version: "",
-      },
-      { $set: { version: "Standard" } },
-    );
-    const wishResult = await WishList.updateMany(
-      {
-        version: { $exists: false },
-      },
-      { $set: { version: "" } },
-    );
-    console.log(
-      `成功更新vinyl${vinylResult.modifiedCount}筆 wish${wishResult.modifiedCount}筆`,
-    );
+    const wishlist = await WishList.find({
+      coverSource: { $exists: false },
+      album: { $exists: true },
+      artist: { $exists: true },
+    });
+    for (const doc of wishlist) {
+      const { imgUrl, sourceUrl } = await fetchAlbumCover(
+        doc.artist,
+        doc.album,
+      );
+      await WishList.updateOne(
+        {
+          _id: doc._id,
+        },
+        { $set: { coverSource: sourceUrl } },
+      );
+    }
+    console.log(`處裡${wishlist.length}資料`);
   } catch (error) {
     console.error(error);
   }

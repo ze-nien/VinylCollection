@@ -9,6 +9,7 @@ const VinylSchema = new mongoose.Schema(
     version: { type: String, default: "Standard" },
     year: { type: String, required: true },
     coverUrl: String,
+    coverSource: String,
     albumRating: Number,
     notes: {
       type: String,

@@ -18,7 +18,7 @@ const SideBar = () => {
   //Add Home出現時機判斷依據
   const curloaction = useLocation();
   const { id } = useParams();
-  const isInvalidRoute = id && vinyl;
+  const isInvalidRoute = id && vinyl; //編輯頁
   //Genre篩選邏輯
   const displayGenres = ["uncategorized", ...GENRES];
   const handleGenreClick = (g: string) => {
@@ -42,12 +42,26 @@ const SideBar = () => {
       )}
       {(curloaction.pathname === "/add" ||
         curloaction.pathname === "/auth/login" ||
+        curloaction.pathname === "/stats" ||
+        curloaction.pathname === "/wishlist" ||
         isInvalidRoute) && (
         <Link to="/" className="hover:text-white transition">
-          <h3 className="text-2xl md:mt-2 text-center">Home</h3>
+          <h3 className="text-2xl md:mt-2">Home</h3>
         </Link>
       )}
-
+      {curloaction.pathname === "/stats" && (
+        <div className="flex flex-col">
+          <Link to="/stats?type=vinyl" className="hover:text-white transition">
+            <h3 className="text-xl md:mt-2">Vinyl</h3>
+          </Link>
+          <Link
+            to="/stats?type=wishlist"
+            className="hover:text-white transition"
+          >
+            <h3 className="text-xl md:mt-2">WishList</h3>
+          </Link>
+        </div>
+      )}
       {curloaction.pathname === "/" && (
         <>
           {/* sidebar內容展開收起 */}

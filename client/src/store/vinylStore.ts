@@ -2,14 +2,7 @@ import axios from "axios";
 import api from "../api/axiosInstance";
 import { create } from "zustand";
 import type { Vinyl, VinylBase } from "../types/vinyl";
-
-//頁數定義
-interface Pagination {
-  total: number;
-  page: number;
-  pages: number;
-  limit: number;
-}
+import type { Pagination, Stats, VinylStats } from "../types/common";
 
 //回傳資料定義
 interface FetchVinylsResponse {
@@ -41,6 +34,7 @@ interface VinylState {
   error: string | null; //錯誤訊息
   isLoading: boolean; //讀取狀態
   filters: Filter; //篩選
+  stats: VinylStats | Stats | null; //統計
   updateFilter: (newFilters: Partial<Filter>) => void; //更新局部篩選
   fetchVinyls: (page?: number, limit?: number) => Promise<void>; //取得所有
   fetchVinyl: (id: string) => Promise<void>; //取得特定
@@ -48,6 +42,7 @@ interface VinylState {
   updateVinyl: (id: string, updatedVinyl: VinylBase) => Promise<void>; //更新
   deleteVinyl: (id: string) => Promise<void>; //刪除
   clearVinyl: () => void; //清除
+  fetchStats: (url: string) => Promise<void>; //統計收藏
 }
 
 export const useVinylStore = create<VinylState>((set, get) => ({
@@ -57,6 +52,7 @@ export const useVinylStore = create<VinylState>((set, get) => ({
   error: null,
   isLoading: false,
   filters: initialFilters,
+  stats: null,
   updateFilter: (newFilter) => {
     set((s) => {
       const updatedFilters = { ...s.filters, ...newFilter };
@@ -177,4 +173,18 @@ export const useVinylStore = create<VinylState>((set, get) => ({
     }
   },
   clearVinyl: () => set({ vinyl: null, isLoading: false }),
+  fetchStats: async (url) => {
+    set({ isLoading: true });
+    try {
+      const res = await api.get<VinylStats>(url);
+      set({ stats: res.data, isLoading: false });
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        const errorMessage =
+          e.response?.data?.message || e.message || "發生未知錯誤";
+        set({ isLoading: false, error: errorMessage });
+      }
+      throw e;
+    }
+  },
 }));

@@ -3,14 +3,7 @@ import api from "../api/axiosInstance";
 import { create } from "zustand";
 import type { WishList, WishListBase } from "../types/wishList";
 import type { VinylBase } from "../types/vinyl";
-
-//頁數定義
-interface Pagination {
-  total: number;
-  page: number;
-  pages: number;
-  limit: number;
-}
+import type { Pagination, Stats } from "../types/common";
 
 //回傳資料定義
 interface FetchWishListResponse {
@@ -30,6 +23,7 @@ interface WishListState {
   listData: WishList | null;
   error: string | null;
   isLoading: boolean;
+  stats: Stats | null; //統計
   fetchWishList: (page?: number) => Promise<void>;
   fetchWishListData: (id: string) => Promise<void>; //取得特定
   addWishListData: (newData: WishListBase) => Promise<void>;
@@ -37,6 +31,7 @@ interface WishListState {
   updateWishList: (id: string, updateData: WishListBase) => Promise<void>;
   deleteWishListData: (id: string) => Promise<void>;
   clearListData: () => void;
+  fetchStats: (url: string) => Promise<void>; //統計收藏
 }
 
 export const useWishListStore = create<WishListState>((set) => ({
@@ -45,6 +40,7 @@ export const useWishListStore = create<WishListState>((set) => ({
   listData: null,
   error: null,
   isLoading: false,
+  stats: null,
   fetchWishList: async (page = 1) => {
     set({ isLoading: true });
     try {
@@ -153,4 +149,18 @@ export const useWishListStore = create<WishListState>((set) => ({
     }
   },
   clearListData: () => set({ listData: null, isLoading: false }),
+  fetchStats: async (url) => {
+    set({ isLoading: true });
+    try {
+      const res = await api.get<Stats>(url);
+      set({ stats: res.data, isLoading: false });
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        const errorMessage =
+          e.response?.data?.message || e.message || "發生未知錯誤";
+        set({ isLoading: false, error: errorMessage });
+      }
+      throw e;
+    }
+  },
 }));

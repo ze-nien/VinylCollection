@@ -6,6 +6,7 @@ export const wishListSchema = z.object({
   notes: z.string().max(100, "備註不能超過 100 個字").optional(),
   isAcquired: z.boolean().default(false),
   coverUrl: z.string().optional(),
+  coverSource: z.string().optional(),
   year: z
     .number()
     .min(1950, "不早於1950年")

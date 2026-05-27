@@ -1,11 +1,12 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { useLineClamp } from "../hooks/useLineClamp";
+import type { WishList } from "../types/wishList";
+import { checkVinylDuplicate } from "../utils/checkData";
 import { useAuthStore } from "../store/authStore";
 import { useWishListStore } from "../store/wishListStore";
-import type { WishList } from "../types/wishList";
-import { useLineClamp } from "../hooks/useLineClamp";
-import { checkVinylDuplicate } from "../utils/checkData";
 import { useVinylStore } from "../store/vinylStore";
-import toast from "react-hot-toast";
+import Modal from "./Modal";
 
 const WishListCard = ({ data }: { data: WishList }) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -13,7 +14,7 @@ const WishListCard = ({ data }: { data: WishList }) => {
   const deleteWishListData = useWishListStore((s) => s.deleteWishListData);
   const fetchWishListData = useWishListStore((s) => s.fetchWishListData);
   const fetchVinyls = useVinylStore((s) => s.fetchVinyls);
-
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [notesAll, setNotesAll] = useState(false);
   const { elementRef, isClamped } = useLineClamp([data.notes, notesAll]);
 
@@ -73,28 +74,30 @@ const WishListCard = ({ data }: { data: WishList }) => {
                     ? "md:grid-cols-[minmax(100px,1fr)_3fr_1fr]"
                     : "md:grid-cols-[minmax(100px,1fr)_3fr]"
                 } 
-                  border border-white rounded-lg w-full
+                  border border-primary rounded-lg w-full
                   `}
     >
       {/* 圖 */}
       <div className="flex items-center justify-center">
         <div className="size-48 md:size-20 md:w-full md:h-auto md:aspect-square">
-          <img
-            src={data.coverUrl || "/images/DEFAULT.jpg"}
-            alt=""
-            className="w-full h-full object-cover rounded-md shrink-0"
-            onError={(e) => (e.currentTarget.src = "/images/DEFAULT.jpg")}
-          />
+          <a target="_blank" href={data.coverSource || ""}>
+            <img
+              src={data.coverUrl || "/images/DEFAULT.jpg"}
+              alt={`${data.album} - ${data.artist}`}
+              className="w-full h-full object-cover rounded-md shrink-0"
+              onError={(e) => (e.currentTarget.src = "/images/DEFAULT.jpg")}
+            />
+          </a>
         </div>
       </div>
       {/* 資料 */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 h-40">
         <h4 className="text-lg">{data.album}</h4>
         <h5 className="text-sm">{data.artist}</h5>
         <h6 className="text-xs">{data.year}</h6>
         <h6 className="text-xs">Version: {data.version}</h6>
         <div>
-          {data.notes && data.notes.trim() !== "" ? (
+          {data.notes?.trim() ? (
             <>
               {/* 有備註內容固定兩行高 動態摺疊滾動 */}
               <div
@@ -123,9 +126,7 @@ const WishListCard = ({ data }: { data: WishList }) => {
               )}
             </>
           ) : (
-            <div className="h-auto">
-              <h6 className="text-sm break-all text-gray-500">Notes: None</h6>
-            </div>
+            <h6 className="text-sm break-all text-gray-500">Notes: None</h6>
           )}
         </div>
       </div>
@@ -145,13 +146,25 @@ const WishListCard = ({ data }: { data: WishList }) => {
             Purchased
           </button>
           <button
-            onClick={() => deleteWishListData(data._id)}
+            onClick={() => setIsDeleteOpen(true)}
             className="text-red-200 hover:text-red-400 cursor-pointer transition-colors"
           >
             Delete
           </button>
         </div>
       )}
+      <Modal
+        isOpen={isDeleteOpen}
+        title="刪除"
+        onClose={() => setIsDeleteOpen(false)}
+        cancelText="取消刪除"
+        onConfirm={() => deleteWishListData(data._id)}
+        confirmText="確定刪除"
+      >
+        <p>
+          確定刪除 {data.artist} - {data.album} ?
+        </p>
+      </Modal>
     </div>
   );
 };

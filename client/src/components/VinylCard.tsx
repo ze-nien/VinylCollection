@@ -11,33 +11,34 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
   const user = useAuthStore((s) => s.user);
   const deleteVinyl = useVinylStore((s) => s.deleteVinyl);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-
   return (
     <div className="flex flex-col w-70 md:w-50">
       {/* 圖 */}
       <div className="relative aspect-square group">
-        <img
-          src={vinyl.coverUrl || "/images/DEFAULT.jpg"}
-          alt=""
-          className="w-full h-full object-cover"
-          onError={(e) => (e.currentTarget.src = "/images/DEFAULT.jpg")}
-        />
-        {/* 備註 */}
-        {vinyl.notes && (
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-xs p-4 transition
+        <a target="_blank" href={vinyl.coverSource || ""}>
+          <img
+            src={vinyl.coverUrl || "/images/DEFAULT.jpg"}
+            alt={`${vinyl.album} - ${vinyl.artist}`}
+            className="w-full h-full object-cover"
+            onError={(e) => (e.currentTarget.src = "/images/DEFAULT.jpg")}
+          />{" "}
+          {/* 備註 */}
+          {vinyl.notes && (
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-xs p-4 transition
         flex flex-col items-center justify-center text-center
         opacity-0 pointer-events-none 
         group-hover:opacity-100 group-hover:pointer-events-auto"
-          >
-            <p
-              className={`text-xs text-gray-400 break-all `}
-              title={vinyl.notes}
             >
-              &quot; {vinyl.notes} &quot;
-            </p>
-          </div>
-        )}
+              <p
+                className={`text-xs text-gray-400 break-all `}
+                title={vinyl.notes}
+              >
+                &quot; {vinyl.notes} &quot;
+              </p>
+            </div>
+          )}
+        </a>
       </div>
       {/* 資訊 */}
       <h3 className="text-xl">{vinyl.album}</h3>

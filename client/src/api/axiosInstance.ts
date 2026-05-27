@@ -4,7 +4,8 @@ import { useAuthStore } from "../store/authStore";
 
 //建立axios實例
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
+  // baseURL: "http://localhost:3000/api",
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000, //發送請求超過10秒視為請求失敗
   withCredentials: true, //允許跨域請求攜帶並寫入Cookie
 });
