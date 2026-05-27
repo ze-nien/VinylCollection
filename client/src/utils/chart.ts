@@ -25,7 +25,34 @@ export const getEraChartConfig = (
   options: {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { position: "bottom" } },
+    layout: {
+      padding: {
+        bottom: 30, // 在底部增加空間，避免圖例貼死邊緣
+      },
+    },
+    plugins: {
+      legend: {
+        display: true, // 是否顯示圖例
+        position: "bottom", // 'top', 'bottom', 'left', 'right'
+        align: "center", // 對齊方式: 'start', 'center', 'end'
+        labels: {
+          usePointStyle: true, // 將標記改為圓點
+          pointStyle: "circle",
+          padding: 20, // 圖例之間的間距
+          font: {
+            size: 12,
+          },
+        },
+      },
+      tooltip: {
+        displayColors: false,
+        callbacks: {
+          label: (context) => {
+            return `${context.parsed} 張`;
+          },
+        },
+      },
+    },
   },
 });
 
@@ -49,5 +76,13 @@ export const getGenreChartConfig = (
     responsive: true,
     maintainAspectRatio: false,
     scales: { x: { grid: { color: "#001514" } } },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        displayColors: false,
+      },
+    },
   },
 });
