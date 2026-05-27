@@ -80,8 +80,12 @@ const Stats = () => {
                 <BaseChart config={genreConfig} />
               </div>
             )}
-            <div className="h-100 bg-primary p-3 rounded-2xl shadow-sm">
-              <h4 className="text-secondary text-center font-bold text-lg mb-1">
+            <div
+              className={`h-100 bg-primary p-3 rounded-2xl shadow-sm ${currentType === "wishlist" ? "col-span-3" : ""}`}
+            >
+              <h4
+                className={`text-secondary text-center font-bold text-lg mb-1`}
+              >
                 年代分佈
               </h4>
               <BaseChart config={eraConfig} />
