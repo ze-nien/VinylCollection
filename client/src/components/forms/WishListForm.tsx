@@ -84,6 +84,14 @@ const WishListForm = () => {
       } else {
         await addWishListData(data);
       }
+      reset({
+        album: "",
+        artist: "",
+        notes: "",
+        version: "Standard",
+        year: undefined,
+        isAcquired: false,
+      });
 
       // --- 根據檢查結果，跳出不同的成功/警告通知 (UX) ---
       if (checkResult.type === "VERSION_DIFFERENT") {

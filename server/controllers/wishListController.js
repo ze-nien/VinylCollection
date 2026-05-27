@@ -56,7 +56,6 @@ export const createWishListData = async (req, res, next) => {
     const { album, artist, notes, isAcquired, year, version } = req.body;
     const { imageUrl: fetchCoverUrl, sourceUrl: fetchCoverSource } =
       await fetchAlbumCover(artist, album);
-    console.log(fetchCoverUrl, fetchCoverSource);
     const coverUrl =
       fetchCoverUrl === "none" ? "/images/DEFAULT.jpg" : fetchCoverUrl;
     const coverSource = fetchCoverSource || "";
@@ -81,19 +80,28 @@ export const createWishListData = async (req, res, next) => {
 export const updateWishListData = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
-    const { artist, album } = updateData;
-    const fetchCoverUrl = await fetchAlbumCover(artist, album);
+    const { artist, album, year, isAcquired, version, notes } = req.body;
+    const { imageUrl: fetchCoverUrl, sourceUrl: fetchCoverSource } =
+      await fetchAlbumCover(artist, album);
     const coverUrl =
       fetchCoverUrl === "none" ? "/images/DEFAULT.jpg" : fetchCoverUrl;
-    const newData = await WishList.findByIdAndUpdate(
-      id,
-      { ...updateData, coverUrl },
-      {
-        returnDocument: "after",
-        runVaildators: true,
-      },
-    );
+    const coverSource = fetchCoverSource || "";
+    const finalVersion = version === "" ? "Standard" : version;
+    const update = {
+      album,
+      artist,
+      notes,
+      isAcquired,
+      version: finalVersion,
+      year,
+      coverUrl,
+      coverSource,
+    };
+    console.log(update);
+    const newData = await WishList.findByIdAndUpdate(id, update, {
+      returnDocument: "after",
+      runVaildators: true,
+    });
     if (!newData) {
       const e = new Error("找不到該黑膠唱片的 ID，無法編輯");
       e.status = 404;
