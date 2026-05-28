@@ -12,14 +12,13 @@ import FormField from "./FormField";
 
 const WishListForm = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const addWishListData = useWishListStore((s) => s.addWishListData);
-  const updateWishList = useWishListStore((s) => s.updateWishList);
   const wishList = useWishListStore((s) => s.wishList);
   const listData = useWishListStore((s) => s.listData);
+  const addWishListData = useWishListStore((s) => s.addWishListData);
+  const updateWishList = useWishListStore((s) => s.updateWishList);
   const clearListData = useWishListStore((s) => s.clearListData);
   const id = listData ? listData._id : null;
   const isEditMode = Boolean(id);
-
   const {
     register,
     handleSubmit,
@@ -32,26 +31,25 @@ const WishListForm = () => {
       artist: "",
       notes: "",
       version: "Standard",
-      year: undefined,
+      year: new Date().getFullYear(),
       isAcquired: false,
     },
+    values: listData
+      ? (({ _id, ...rest }) => ({
+          ...rest,
+          year: Number(rest.year),
+          version: listData.version === "" ? "Standard" : listData.version,
+        }))(listData)
+      : {
+          album: "",
+          artist: "",
+          notes: "",
+          version: "Standard",
+          year: new Date().getFullYear(),
+          isAcquired: false,
+        },
     mode: "onChange",
   });
-
-  useEffect(() => {
-    if (listData) {
-      reset({ ...listData });
-    } else {
-      reset({
-        album: "",
-        artist: "",
-        notes: "",
-        version: "Standard",
-        year: undefined,
-        isAcquired: false,
-      });
-    }
-  }, [listData, reset]);
 
   useEffect(() => {
     return () => clearListData();
@@ -211,9 +209,10 @@ const WishListForm = () => {
                 type="button"
                 onClick={() => {
                   clearListData(); //Store listData變null
-                  reset(); //rhf回復defaultValues值
                 }}
-                className="px-2 hover:text-gray-400 hover:cursor-pointer transition"
+                className="px-2 hover:text-gray-400 hover:cursor-pointer transition
+                disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
               >
                 Cancel
               </button>

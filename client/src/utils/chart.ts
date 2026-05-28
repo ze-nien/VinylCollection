@@ -48,7 +48,7 @@ export const getEraChartConfig = (
         displayColors: false,
         callbacks: {
           label: (context) => {
-            return `${context.parsed} 張`;
+            return `${context.parsed}`;
           },
         },
       },
@@ -75,7 +75,12 @@ export const getGenreChartConfig = (
     indexAxis: "y",
     responsive: true,
     maintainAspectRatio: false,
-    scales: { x: { grid: { color: "#001514" } } },
+    scales: { x: { grid: { color: "#00151499" }, ticks: { stepSize: 4 } } },
+    layout: {
+      padding: {
+        bottom: 30, // 在底部增加空間，避免圖例貼死邊緣
+      },
+    },
     plugins: {
       legend: {
         display: false,

@@ -26,40 +26,20 @@ const WishListCard = ({ data }: { data: WishList }) => {
       if (checkResult.type === "ABSOLUTE_DUPLICATE") {
         toast.error(
           `轉移失敗！您的實際收藏中已存在《${listData.album}》(${listData.version}) `,
-          {
-            style: {
-              borderRadius: "10px",
-              background: "#ff4b4b",
-              color: "#fff",
-            },
-          },
         );
-        return; // 🛑 阻斷，不呼叫後端 API
+        return;
       }
-      // 4. ⚠️ 情況三：名字一樣，但「版本不同」（跳出提示並允許轉移）
       if (checkResult.type === "VERSION_DIFFERENT") {
         await moveToVinyl(listData._id);
-
         toast(`已成功移至收藏！已自動為您區分為不同版本。`, {
           icon: "⚠️",
-          style: {
-            borderRadius: "10px",
-            background: "#fef3c7",
-            color: "#92400e",
-            border: "1px solid #f59e0b",
-          },
+          className: "rounded-xl font-medium",
           duration: 4000,
         });
         return;
       }
-      // 5. 🟢 情況四：SAFE 完全沒撞車，順暢轉移
       await moveToVinyl(listData._id);
-      toast.success(
-        `恭喜入手！《${listData.album}》已正式移至您的黑膠收藏 🎶`,
-        {
-          style: { borderRadius: "10px", background: "#333", color: "#fff" },
-        },
-      );
+      toast.success(`《${listData.album}》已正式移至您的黑膠收藏`);
     } catch (error) {
       console.error("轉移資料時發生錯誤：", error);
     }
@@ -134,7 +114,10 @@ const WishListCard = ({ data }: { data: WishList }) => {
       {isAuthenticated && (
         <div className="flex flex-col gap-2 justify-center pr-2">
           <button
-            onClick={() => fetchWishListData(data._id)}
+            onClick={() => {
+              fetchWishListData(data._id);
+              window.scroll(0, 0);
+            }}
             className="text-gray-300 hover:text-gray-400 cursor-pointer transition-colors"
           >
             Edit

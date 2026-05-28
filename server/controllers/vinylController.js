@@ -78,8 +78,6 @@ export const createVinyl = async (req, res, next) => {
       req.body;
     const { imageUrl: fetchCoverUrl, sourceUrl: fetchCoverSource } =
       await fetchAlbumCover(artist, album);
-
-    console.log("備用函式即將回傳：", { fetchCoverUrl, fetchCoverSource });
     const coverUrl =
       fetchCoverUrl === "none" ? "/images/DEFAULT.jpg" : fetchCoverUrl;
     const coverSource = fetchCoverSource || "";
@@ -126,14 +124,16 @@ export const editVinyl = async (req, res, next) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-    const { artist, album } = updateData;
-    const fetchCoverUrl = await fetchAlbumCover(artist, album);
+    const { artist, album, version } = updateData;
+    const { imageUrl: fetchCoverUrl, sourceUrl: fetchCoverSource } =
+      await fetchAlbumCover(artist, album);
     const coverUrl =
       fetchCoverUrl === "none" ? "/images/DEFAULT.jpg" : fetchCoverUrl;
-
+    const coverSource = fetchCoverSource || "";
+    const finalVersion = version === "" ? "Standard" : version;
     const newData = await Vinyl.findByIdAndUpdate(
       id,
-      { ...updateData, coverUrl },
+      { ...updateData, coverUrl, coverSource, version: finalVersion },
       {
         runVaildators: true,
       },

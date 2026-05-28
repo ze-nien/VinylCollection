@@ -58,24 +58,27 @@ const Stats = () => {
                 : "grid-cols-2"
             } gap-6`}
           >
-            <StatCard title="總數量" value={`${currentData?.total || 0} 張`} />
+            <StatCard
+              title="Total Count"
+              value={`${currentData?.total || 0}`}
+            />
             {currentData?.genreDistribution &&
             currentData?.genreDistribution.length > 0 ? (
               <StatCard
-                title="核心曲風"
-                value={currentData?.genreDistribution?.[0]?.genreName || "無"}
+                title="Primary Genres"
+                value={currentData?.genreDistribution?.[0]?.genreName || "none"}
               />
             ) : null}
             <StatCard
-              title="主要年代"
-              value={currentData?.eraDistribution?.slice(-1)[0]?.era || "無"}
+              title="Dominant Decades"
+              value={currentData?.eraDistribution?.slice(-1)[0]?.era || "none"}
             />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {currentType === "vinyl" && (
-              <div className="lg:col-span-2 h-100 bg-primary p-3 rounded-2xl shadow-sm">
+              <div className="lg:col-span-2 h-92 bg-primary p-3 rounded-2xl shadow-sm">
                 <h4 className="text-secondary text-center font-bold text-lg">
-                  曲風分佈
+                  Genre Distribution
                 </h4>
                 <BaseChart config={genreConfig} />
               </div>
@@ -86,7 +89,7 @@ const Stats = () => {
               <h4
                 className={`text-secondary text-center font-bold text-lg mb-1`}
               >
-                年代分佈
+                Decades Distribution
               </h4>
               <BaseChart config={eraConfig} />
             </div>

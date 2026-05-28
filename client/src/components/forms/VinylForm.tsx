@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import type { SubmitErrorHandler, SubmitHandler } from "react-hook-form";
 import { useBlocker, useNavigate, useParams } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +25,6 @@ const VinylForm = () => {
   const vinyls = useVinylStore((s) => s.vinyls);
   const { id } = useParams<{ id: string }>();
   const isEditMode = Boolean(id);
-
   const {
     register,
     handleSubmit,
@@ -40,25 +39,28 @@ const VinylForm = () => {
       genre: [],
       coverUrl: "",
       version: "Standard",
-      year: undefined,
+      year: new Date().getFullYear(),
       albumRating: 1,
       notes: "",
     },
     //values 傳進來的變數發生變動時 自動把資料填入表單各個輸入框中
     values: vinyl //偵測vinyl從undefined變成一筆黑膠唱片資料 自動調用reset()
-      ? {
-          ...vinyl,
-          year: Number(vinyl.year),
-          coverUrl: vinyl.coverUrl ? String(vinyl.coverUrl) : "",
-          albumRating: vinyl.albumRating ? Number(vinyl.albumRating) : 1,
-        }
+      ? (({ _id, ...rest }) => ({
+          ...rest,
+          year: Number(rest.year),
+          albumRating: rest.albumRating ? Number(rest.albumRating) : 1,
+        }))(vinyl)
       : undefined,
     mode: "onChange", //輸入錯立刻顯示errors.message
   });
+  const watchNotes = useWatch({ control, name: "notes", defaultValue: "" });
 
   //編輯頁載入資料
   useEffect(() => {
-    if (id) fetchVinyl(id);
+    if (id) {
+      fetchVinyl(id);
+      window.scroll(0, 0);
+    }
     return () => clearVinyl();
   }, [id, fetchVinyl, clearVinyl]);
 
@@ -68,13 +70,6 @@ const VinylForm = () => {
       if (checkResult.type === "ABSOLUTE_DUPLICATE") {
         toast.error(
           `《${data.album}》(${data.version || "Standard"}) 已經存在於收藏中！`,
-          {
-            style: {
-              borderRadius: "10px",
-              background: "#ff4b4b",
-              color: "#fff",
-            },
-          },
         );
         return;
       }
@@ -83,17 +78,12 @@ const VinylForm = () => {
       } else {
         await addVinyl(data);
       }
-
+      window.scroll(0, 0);
       // --- 根據檢查結果，跳出不同的成功/警告通知 (UX) ---
       if (checkResult.type === "VERSION_DIFFERENT") {
         toast(`儲存成功！已調整為不同版本。`, {
           icon: "⚠️",
-          style: {
-            borderRadius: "10px",
-            background: "#fef3c7",
-            color: "#92400e",
-            border: "1px solid #f59e0b",
-          },
+          className: "rounded-xl font-medium",
           duration: 4000,
         });
       } else {
@@ -202,14 +192,17 @@ const VinylForm = () => {
               label="Notes"
               tag="textarea"
               maxLength={100}
-              defaultValue={vinyl ? vinyl.notes : ""}
               error={errors.notes?.message as string}
               {...register("notes")}
             />
+            <p className="text-xs text-right text-gray-300">
+              {watchNotes?.length} / 100
+            </p>
           </div>
           <div className=" text-center mb-2">
             <button
-              className="disabled:opacity-50 disabled:cursor-not-allowed"
+              className="hover:text-primary transition hover:cursor-pointer
+              disabled:opacity-50 disabled:cursor-not-allowed"
               type="submit"
               disabled={isSubmitting}
             >

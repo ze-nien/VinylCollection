@@ -16,7 +16,7 @@ const Login = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormInput>({
     defaultValues: {
       userName: "",
@@ -37,13 +37,7 @@ const Login = () => {
       const res = await api.post("/auth/login", data);
       if (res.data.success) {
         login(res.data);
-        toast.success("登入成功", {
-          style: {
-            borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
-          },
-        });
+        toast.success("登入成功");
         navigate("/");
       }
     } catch (error) {
@@ -58,7 +52,7 @@ const Login = () => {
     >
       <div className="flex flex-col items-end h-16">
         <div className="flex items-center gap-2">
-          <label>帳號</label>
+          <label>Username</label>
           <input
             type="text"
             className="text-secondary"
@@ -73,7 +67,7 @@ const Login = () => {
       </div>
       <div className="flex flex-col items-end h-16">
         <div className="flex items-center gap-2">
-          <label>密碼</label>
+          <label>Password</label>
           <input
             type="password"
             className="text-secondary"
@@ -86,7 +80,14 @@ const Login = () => {
           </p>
         )}
       </div>
-      <button type="submit">登入</button>
+      <button
+        className="hover:text-primary transition hover:cursor-pointer
+      disabled:opacity-50 disabled:cursor-not-allowed"
+        type="submit"
+        disabled={isSubmitting}
+      >
+        Login
+      </button>
     </form>
   );
 };

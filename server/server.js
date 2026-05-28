@@ -77,7 +77,7 @@ const migrateOldData = async () => {
 mongoose
   .connect(mongoURI)
   .then(() => {
-    console.log("連接mongoDB..");
+    console.log(`連接mongoDB..${mongoURI}`);
     // migrateOldData();
   })
   .catch((e) => console.error(e));
