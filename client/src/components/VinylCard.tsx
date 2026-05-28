@@ -10,25 +10,42 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
   const deleteVinyl = useVinylStore((s) => s.deleteVinyl);
+  const [showNotes, setShowNotes] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   return (
     <div className="flex flex-col w-70 md:w-50">
       {/* 圖 */}
-      <div className="relative aspect-square group">
+      <div className="relative aspect-square">
         <a target="_blank" href={vinyl.coverSource || ""}>
           <img
             src={vinyl.coverUrl || "/images/DEFAULT.jpg"}
             alt={`${vinyl.album} - ${vinyl.artist}`}
             className="w-full h-full object-cover"
             onError={(e) => (e.currentTarget.src = "/images/DEFAULT.jpg")}
-          />{" "}
-          {/* 備註 */}
-          {vinyl.notes && (
+          />
+        </a>
+
+        {/* 備註 */}
+        {vinyl.notes && (
+          <div>
+            <button
+              onClick={() => setShowNotes(!showNotes)}
+              className="absolute top-1 right-1 z-20
+               bg-black/30 text-gray-300/80
+                hover:bg-black/70 hover:text-gray-200 transition
+                 rounded-full size-5
+                 flex items-center justify-center text-xs"
+            >
+              i
+            </button>
             <div
-              className="absolute inset-0 bg-black/60 backdrop-blur-xs p-4 transition
+              className={`absolute inset-0 bg-black/60 backdrop-blur-xs p-4 transition
         flex flex-col items-center justify-center text-center
-        opacity-0 pointer-events-none 
-        group-hover:opacity-100 group-hover:pointer-events-auto"
+       ${
+         showNotes
+           ? "opacity-100 pointer-events-auto"
+           : "opacity-0 pointer-events-none"
+       } `}
             >
               <p
                 className={`text-xs text-gray-400 break-all `}
@@ -37,8 +54,8 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
                 &quot; {vinyl.notes} &quot;
               </p>
             </div>
-          )}
-        </a>
+          </div>
+        )}
       </div>
       {/* 資訊 */}
       <h3 className="text-xl">{vinyl.album}</h3>

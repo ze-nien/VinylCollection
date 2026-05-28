@@ -76,7 +76,7 @@ const Stats = () => {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {currentType === "vinyl" && (
-              <div className="lg:col-span-2 h-92 bg-primary p-3 rounded-2xl shadow-sm">
+              <div className="lg:col-span-2 h-100 bg-primary p-3 rounded-2xl shadow-sm">
                 <h4 className="text-secondary text-center font-bold text-lg">
                   Genre Distribution
                 </h4>

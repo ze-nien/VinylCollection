@@ -19,8 +19,8 @@ console.log(`伺服器運行模式：[${process.env.NODE_ENV}]`);
 const app = express();
 
 const allowedOrigins = [
-  // "http://localhost:5173",
-  "https://vinyl-collection-liard.vercel.app",
+  "http://localhost:5173",
+  // "https://vinyl-collection-liard.vercel.app",
 ];
 
 app.use(
@@ -46,8 +46,8 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
-const mongoURI = process.env.MONGODB_URI_ATLAS;
-// const mongoURI = process.env.MONGODB_URI;
+// const mongoURI = process.env.MONGODB_URI_ATLAS;
+const mongoURI = process.env.MONGODB_URI;
 
 const migrateOldData = async () => {
   try {

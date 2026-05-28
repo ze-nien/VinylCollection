@@ -8,8 +8,8 @@ const NavBar = () => {
 
   const navItems = [
     { path: "/", label: "Vinyl Collection", visible: true },
-    { path: "/stats", label: "Stats", visible: true },
     { path: "/wishlist", label: "Wish List", visible: true },
+    { path: "/stats", label: "Stats", visible: true },
     { path: "/auth/login", label: "Login", visible: !isAuthenticated },
   ];
 
@@ -43,7 +43,7 @@ const NavBar = () => {
           <NavLink to="auth/login" className={checkActive}>
             Login
           </NavLink>
-        )}{" "}
+        )}
       </div>
     </div>
   );
