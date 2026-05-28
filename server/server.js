@@ -22,7 +22,7 @@ const allowedOrigins = [
   // "http://localhost:5173",
   "https://vinyl-collection-liard.vercel.app",
 ];
-const mongoURI = process.ev.MONGODB_URI_ATLAS;
+const mongoURI = process.env.MONGODB_URI_ATLAS;
 // const mongoURI = process.env.MONGODB_URI;
 
 app.use(
