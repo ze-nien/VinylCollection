@@ -48,7 +48,7 @@ const WishListCard = ({ data }: { data: WishList }) => {
   return (
     <div
       key={data._id}
-      className={`flex flex-col gap-2 p-2 md:grid
+      className={`flex flex-col gap-2 p-2 max-w-2xl md:grid
                 ${
                   isAuthenticated
                     ? "md:grid-cols-[minmax(100px,1fr)_3fr_1fr]"

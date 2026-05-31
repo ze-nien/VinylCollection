@@ -31,7 +31,7 @@ const WishList = () => {
         <Spinner />
       ) : (
         <>
-          <div className="flex flex-col px-5 w-full gap-3 py-5">
+          <div className="flex flex-col items-center px-5 w-full gap-3 py-5">
             {wishList.length > 0 ? (
               wishList.map((d) => <WishListCard key={d._id} data={d} />)
             ) : (
