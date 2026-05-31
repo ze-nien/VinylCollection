@@ -87,9 +87,10 @@ const WishListForm = () => {
         artist: "",
         notes: "",
         version: "Standard",
-        year: undefined,
+        year: new Date().getFullYear(),
         isAcquired: false,
       });
+      clearListData();
 
       // --- 根據檢查結果，跳出不同的成功/警告通知 (UX) ---
       if (checkResult.type === "VERSION_DIFFERENT") {
@@ -102,8 +103,6 @@ const WishListForm = () => {
         // SAFE 狀態
         toast.success(isEditMode ? "編輯成功" : "新增成功");
       }
-      reset();
-      clearListData();
       useWishListStore.getState().fetchWishList(1);
     } catch (e) {
       console.error("提交黑膠表單時發生權限或阻斷錯誤：", e);
