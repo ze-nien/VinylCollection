@@ -27,20 +27,25 @@ const WishList = () => {
       {/* 新增 */}
       {isAuthenticated && <WishListForm />}
       {/* 現有 */}
-      {isLoading && <Spinner />}
-      <div className="flex flex-col px-5 w-full gap-3 py-5">
-        {wishList.length > 0 ? (
-          wishList.map((d) => <WishListCard key={d._id} data={d} />)
-        ) : (
-          <h3 className="m-5 text-center">No data</h3>
-        )}
-      </div>
-      {pagination && (
-        <Pagination
-          currentPage={pagination.page}
-          totalPages={pagination.pages}
-          onPageChange={handlePageChange}
-        />
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <>
+          <div className="flex flex-col px-5 w-full gap-3 py-5">
+            {wishList.length > 0 ? (
+              wishList.map((d) => <WishListCard key={d._id} data={d} />)
+            ) : (
+              <h3 className="m-5 text-center">No data</h3>
+            )}
+          </div>
+          {pagination && (
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </>
       )}
     </div>
   );
