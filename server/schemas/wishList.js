@@ -37,5 +37,7 @@ export const getWishListSchema = z.object({
       .string()
       .optional()
       .transform((val) => (val ? Number(val) : 10)),
+    sort: z.string().optional(),
+    yearRange: z.string().optional(),
   }),
 });

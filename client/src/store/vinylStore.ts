@@ -2,30 +2,19 @@ import axios from "axios";
 import api from "../api/axiosInstance";
 import { create } from "zustand";
 import type { Vinyl, VinylBase } from "../types/vinyl";
-import type { Pagination, Stats, VinylStats } from "../types/common";
+import {
+  type Pagination,
+  type Filter,
+  type Stats,
+  type VinylStats,
+  initialVinylFilters,
+} from "../types/common";
 
 //回傳資料定義
 interface FetchVinylsResponse {
   data: Vinyl[];
   pagination: Pagination;
 }
-
-//篩選定義
-interface Filter {
-  limit: number;
-  artistSort: string; // createdAt | asc | desc
-  genre: string[];
-  yearRange: string; // ~80s | 90s | 00s | 10s | 20s
-  albumRating: string; // 3,4,5 | All
-}
-//篩選初始值
-const initialFilters: Filter = {
-  limit: 12, //預設每頁12筆
-  artistSort: "createdAt", // 預設排序：最新
-  genre: [], // 預設不限曲風
-  yearRange: "All", // 預設不限年代
-  albumRating: "All", // 預設不限評分
-};
 
 interface VinylState {
   vinyls: Vinyl[]; //多個資料
@@ -51,7 +40,7 @@ export const useVinylStore = create<VinylState>((set, get) => ({
   vinyl: null,
   error: null,
   isLoading: false,
-  filters: initialFilters,
+  filters: initialVinylFilters,
   stats: null,
   updateFilter: (newFilter) => {
     set((s) => {
@@ -74,9 +63,9 @@ export const useVinylStore = create<VinylState>((set, get) => ({
       const { filters } = get();
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: filters.limit.toString(),
+        limit: (filters?.limit ?? 12).toString(),
         sort: filters.artistSort,
-        genre: filters.genre.join(","),
+        genre: (filters?.genre ?? []).join(","),
         yearRange: filters.yearRange,
         minAlbumRating: filters.albumRating?.toString() || "",
       });

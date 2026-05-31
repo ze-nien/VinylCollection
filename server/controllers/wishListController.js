@@ -8,13 +8,29 @@ import { getWishListSchema } from "../schemas/wishList.js";
 //所有資料
 export const getWishList = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10 } = getWishListSchema.shape.query.parse(
-      req.query,
-    );
+    const {
+      page = 1,
+      limit = 10,
+      sort,
+      yearRange,
+    } = getWishListSchema.shape.query.parse(req.query);
     const skip = (Number(page) - 1) * Number(limit);
+    let query = {};
+    if (yearRange && yearRange.endsWith("s") && yearRange !== "All") {
+      const decade = parseInt(yearRange);
+      //1950 - 2049
+      const fullYear = decade >= 50 ? 1900 + decade : 2000 + decade;
+      query.year = {
+        $gte: fullYear,
+        $lte: fullYear + 9,
+      };
+    }
+    let sortOrder = { createdAt: -1 };
+    if (sort === "asc") sortOrder = { artist: 1 };
+    if (sort === "desc") sortOrder = { artist: -1 };
     const [wishList, total] = await Promise.all([
-      WishList.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
-      WishList.countDocuments(),
+      WishList.find(query).sort(sortOrder).skip(skip).limit(limit),
+      WishList.countDocuments(query),
     ]);
     res.status(200).json({
       data: wishList,

@@ -3,6 +3,7 @@ const router = express.Router();
 
 import { parseUser, requireAdmin } from "../middlewares/authMiddleware.js";
 import validate from "../middlewares/validateMiddleware.js";
+import { checkData } from "../middlewares/checkDataMiddleware.js";
 import {
   createWishListSchema,
   updateWishListSchema,
@@ -18,6 +19,8 @@ import {
   moveToVinyl,
   fetchStatsWL,
 } from "../controllers/wishListController.js";
+import WishList from "../models/WishList.js";
+import Vinyl from "../models/Vinyl.js";
 
 router.get("/", getWishList);
 router.post(
@@ -25,6 +28,7 @@ router.post(
   parseUser,
   requireAdmin,
   validate(createWishListSchema),
+  checkData(WishList, Vinyl),
   createWishListData,
 );
 router.get("/stats", fetchStatsWL);
@@ -40,6 +44,7 @@ router.patch(
   parseUser,
   requireAdmin,
   validate(updateWishListSchema),
+  checkData(WishList, Vinyl),
   updateWishListData,
 );
 router.delete(

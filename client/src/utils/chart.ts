@@ -75,7 +75,12 @@ export const getGenreChartConfig = (
     indexAxis: "y",
     responsive: true,
     maintainAspectRatio: false,
-    scales: { x: { grid: { color: "#00151499" }, ticks: { stepSize: 4 } } },
+    scales: {
+      x: {
+        grid: { color: "#00151499" },
+        ticks: { stepSize: 4, maxRotation: 0, minRotation: 0 },
+      },
+    },
     layout: {
       padding: {
         bottom: 30, // 在底部增加空間，避免圖例貼死邊緣

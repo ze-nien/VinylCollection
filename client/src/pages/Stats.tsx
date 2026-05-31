@@ -66,12 +66,24 @@ const Stats = () => {
             currentData?.genreDistribution.length > 0 ? (
               <StatCard
                 title="Primary Genres"
-                value={currentData?.genreDistribution?.[0]?.genreName || "none"}
+                value={
+                  [...(currentData?.genreDistribution || [])]
+                    .sort((a, b) => b.count - a.count)
+                    .filter((item, _, arr) => item.count === arr[0]?.count)
+                    .map((i) => i.genreName)
+                    .join(", ") || "none"
+                }
               />
             ) : null}
             <StatCard
               title="Dominant Decades"
-              value={currentData?.eraDistribution?.slice(-1)[0]?.era || "none"}
+              value={
+                [...(currentData?.eraDistribution || [])]
+                  .sort((a, b) => b.count - a.count)
+                  .filter((item, _, arr) => item.count === arr[0]?.count)
+                  .map((i) => i.era)
+                  .join(", ") || "none"
+              }
             />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

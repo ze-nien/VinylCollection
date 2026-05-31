@@ -7,6 +7,7 @@ import {
   getCleanRecommendations,
 } from "../services/lastFmService.js";
 import { getAllVinylsSchema } from "../schemas/vinyl.js";
+import { fetchVinylVersion } from "../services/discogsService.js";
 
 //所有資料GET('api/vinyls')
 export const getAllVinyls = async (req, res, next) => {
@@ -105,7 +106,9 @@ export const getVinyl = async (req, res, next) => {
     const { id } = req.params;
     const vinyl = await Vinyl.findById(id).exec();
     if (vinyl) {
-      console.log(`search result: ${vinyl}`);
+      // const a = await fetchVinylVersion(vinyl.artist, vinyl.album);
+      // console.log(a);
+      // console.log(`search result: ${vinyl}`);
       res.status(200).json(vinyl);
     } else {
       {

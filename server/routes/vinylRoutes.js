@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 
+import Vinyl from "../models/Vinyl.js";
 import { parseUser, requireAdmin } from "../middlewares/authMiddleware.js";
 
 import validate from "../middlewares/validateMiddleware.js";
@@ -26,7 +27,7 @@ router.post(
   parseUser,
   requireAdmin,
   validate(createVinylSchema),
-  checkData,
+  checkData(Vinyl),
   createVinyl,
 );
 router.get("/stats", fetchStats);
@@ -36,7 +37,7 @@ router.patch(
   parseUser,
   requireAdmin,
   validate(updateVinylSchema),
-  checkData,
+  checkData(Vinyl),
   editVinyl,
 );
 router.delete(

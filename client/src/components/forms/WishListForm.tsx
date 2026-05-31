@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { wishListSchema } from "../../types/wishList";
 import type { WishListBase } from "../../types/wishList";
 import { useWishListStore } from "../../store/wishListStore";
+import { useVinylStore } from "../../store/vinylStore";
 import { checkVinylDuplicate } from "../../utils/checkData";
 import Modal from "../Modal";
 import FormField from "./FormField";
@@ -62,17 +63,16 @@ const WishListForm = () => {
 
   const onSubmit: SubmitHandler<WishListBase> = async (data) => {
     try {
-      const checkResult = checkVinylDuplicate(id ?? null, data, wishList);
+      const targetVinyls = useVinylStore.getState().vinyls;
+      const checkResult = checkVinylDuplicate(
+        id ?? null,
+        data,
+        wishList,
+        targetVinyls,
+      );
       if (checkResult.type === "ABSOLUTE_DUPLICATE") {
         toast.error(
-          `《${data.album}》(${data.version || "Standard"}) 已經存在於清單中！`,
-          {
-            style: {
-              borderRadius: "10px",
-              background: "#ff4b4b",
-              color: "#fff",
-            },
-          },
+          `《${data.album}》(${data.version || "Standard"}) 已經存在於收藏或清單中！`,
         );
         return;
       }
@@ -95,12 +95,7 @@ const WishListForm = () => {
       if (checkResult.type === "VERSION_DIFFERENT") {
         toast(`儲存成功！已調整為不同版本。`, {
           icon: "⚠️",
-          style: {
-            borderRadius: "10px",
-            background: "#fef3c7",
-            color: "#92400e",
-            border: "1px solid #f59e0b",
-          },
+          className: "rounded-xl font-medium",
           duration: 4000,
         });
       } else {
@@ -204,11 +199,19 @@ const WishListForm = () => {
             >
               {listData ? "Submit" : "Add"}
             </button>
-            {isEditMode && (
+            {(isEditMode || isDirty) && (
               <button
                 type="button"
                 onClick={() => {
                   clearListData(); //Store listData變null
+                  reset({
+                    album: "",
+                    artist: "",
+                    notes: "",
+                    version: "Standard",
+                    year: new Date().getFullYear(),
+                    isAcquired: false,
+                  }); //資料回預設值
                 }}
                 className="px-2 hover:text-gray-400 hover:cursor-pointer transition
                 disabled:opacity-50 disabled:cursor-not-allowed"

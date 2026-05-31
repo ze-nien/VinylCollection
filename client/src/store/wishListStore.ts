@@ -3,7 +3,12 @@ import api from "../api/axiosInstance";
 import { create } from "zustand";
 import type { WishList, WishListBase } from "../types/wishList";
 import type { VinylBase } from "../types/vinyl";
-import type { Pagination, Stats } from "../types/common";
+import {
+  type Pagination,
+  type Filter,
+  type Stats,
+  initialWishListFilters,
+} from "../types/common";
 
 //回傳資料定義
 interface FetchWishListResponse {
@@ -23,7 +28,9 @@ interface WishListState {
   listData: WishList | null;
   error: string | null;
   isLoading: boolean;
+  filters: Filter;
   stats: Stats | null; //統計
+  updateFilter: (newFilters: Partial<Filter>) => void; //更新局部篩選
   fetchWishList: (page?: number) => Promise<void>;
   fetchWishListData: (id: string) => Promise<void>; //取得特定
   addWishListData: (newData: WishListBase) => Promise<void>;
@@ -34,19 +41,34 @@ interface WishListState {
   fetchStats: (url: string) => Promise<void>; //統計收藏
 }
 
-export const useWishListStore = create<WishListState>((set) => ({
+export const useWishListStore = create<WishListState>((set, get) => ({
   wishList: [],
   pagination: null,
   listData: null,
   error: null,
   isLoading: false,
+  filters: initialWishListFilters,
   stats: null,
+  updateFilter: (newFilter) => {
+    set((s) => {
+      const updatedFilters = { ...s.filters, ...newFilter };
+
+      return {
+        filters: updatedFilters,
+      };
+    });
+    get().fetchWishList(1);
+  },
   fetchWishList: async (page = 1) => {
     set({ isLoading: true });
     try {
-      const res = await api.get<FetchWishListResponse>(
-        `/wishList?page=${page}`,
-      );
+      const { filters } = get();
+      const params = new URLSearchParams({
+        page: page.toString(),
+        sort: filters.artistSort,
+        yearRange: filters.yearRange,
+      });
+      const res = await api.get<FetchWishListResponse>(`/wishList?${params}`);
       if (res?.data)
         set({
           wishList: res.data.data,

@@ -1,24 +1,20 @@
 import { useState } from "react";
-import { Link, useLocation, useParams } from "react-router";
+import { Link, useLocation } from "react-router";
 import { GENRES } from "../types/constants";
-import { useVinylStore } from "../store/vinylStore";
 import BaseSelect from "../components/ui/BaseSelect";
 import BaseRadio from "../components/ui/BaseRadio";
 import FilterButton from "../components/FilterButton";
 import { useAuthStore } from "../store/authStore";
+import useFilterController from "../hooks/useFilterController";
 
 const SideBar = () => {
   //zustand
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const vinyl = useVinylStore((s) => s.vinyl);
-  const filters = useVinylStore((s) => s.filters);
-  const updateFilter = useVinylStore((s) => s.updateFilter);
+  const { filters, updateFilter } = useFilterController();
   //控制展開收起
   const [isOpen, setIsOpen] = useState(false);
   //Add Home出現時機判斷依據
   const curloaction = useLocation();
-  const { id } = useParams();
-  const isInvalidRoute = id && vinyl; //編輯頁
   //Genre篩選邏輯
   const displayGenres = ["uncategorized", ...GENRES];
   const handleGenreClick = (g: string) => {
@@ -40,15 +36,6 @@ const SideBar = () => {
           <h3 className="text-2xl md:mt-2 text-center">Add</h3>
         </Link>
       )}
-      {(curloaction.pathname === "/add" ||
-        curloaction.pathname === "/auth/login" ||
-        curloaction.pathname === "/stats" ||
-        curloaction.pathname === "/wishlist" ||
-        isInvalidRoute) && (
-        <Link to="/" className="hover:text-white transition">
-          <h3 className="text-2xl md:mt-2">Home</h3>
-        </Link>
-      )}
       {curloaction.pathname === "/stats" && (
         <div className="flex flex-col">
           <Link to="/stats?type=vinyl" className="hover:text-white transition">
@@ -62,7 +49,8 @@ const SideBar = () => {
           </Link>
         </div>
       )}
-      {curloaction.pathname === "/" && (
+      {(curloaction.pathname === "/" ||
+        curloaction.pathname === "/wishlist") && (
         <>
           {/* sidebar內容展開收起 */}
           <div
@@ -82,22 +70,24 @@ const SideBar = () => {
           `}
           >
             {/* 資料數 */}
-            <div className="flex justify-center">
-              <BaseSelect
-                label="-perPageData-"
-                name="pageLimit"
-                value={filters.limit}
-                options={[
-                  { label: "12", value: 12 },
-                  { label: "24", value: 24 },
-                  { label: "36", value: 36 },
-                ]}
-                onChange={(val) => updateFilter({ limit: Number(val) })}
-              />
-            </div>
+            {filters.limit && (
+              <div className="flex justify-center">
+                <BaseSelect
+                  label="-perPageData-"
+                  name="pageLimit"
+                  value={filters.limit}
+                  options={[
+                    { label: "12", value: 12 },
+                    { label: "24", value: 24 },
+                    { label: "36", value: 36 },
+                  ]}
+                  onChange={(val) => updateFilter({ limit: Number(val) })}
+                />
+              </div>
+            )}
             {/* Artist */}
             <section>
-              <h3 className="text-center">-Sort-</h3>
+              <h3 className="text-center mt-2">-Sort-</h3>
               <BaseRadio
                 name="sort"
                 value={filters.artistSort}
@@ -111,15 +101,17 @@ const SideBar = () => {
               />
             </section>
             {/* Genre */}
-            <section>
-              <h3 className="text-center">-Genre-</h3>
-              <FilterButton
-                options={displayGenres}
-                activeValue={filters.genre}
-                onClick={handleGenreClick}
-                className="grid grid-cols-5 md:grid-cols-2 gap-1 pr-2"
-              />
-            </section>
+            {filters.genre && (
+              <section>
+                <h3 className="text-center">-Genre-</h3>
+                <FilterButton
+                  options={displayGenres}
+                  activeValue={filters.genre}
+                  onClick={handleGenreClick}
+                  className="grid grid-cols-5 md:grid-cols-2 gap-1 pr-2"
+                />
+              </section>
+            )}
             {/* Year */}
             <section>
               <h3 className="text-center">-Year-</h3>
@@ -139,21 +131,23 @@ const SideBar = () => {
               />
             </section>
             {/* Rating */}
-            <section>
-              <h3 className="text-center">-Rating-</h3>
-              <BaseRadio
-                name="albumRating"
-                value={filters.albumRating}
-                options={[
-                  { label: "All", value: "All" },
-                  { label: "3+stars", value: "3" },
-                  { label: "4+stars", value: "4" },
-                  { label: "5 stars", value: "5" },
-                ]}
-                onChange={(value) => updateFilter({ albumRating: value })}
-                className="flex justify-center md:flex-col md:items-start gap-2"
-              />
-            </section>
+            {filters.albumRating && (
+              <section>
+                <h3 className="text-center">-Rating-</h3>
+                <BaseRadio
+                  name="albumRating"
+                  value={filters.albumRating}
+                  options={[
+                    { label: "All", value: "All" },
+                    { label: "3+stars", value: "3" },
+                    { label: "4+stars", value: "4" },
+                    { label: "5 stars", value: "5" },
+                  ]}
+                  onChange={(value) => updateFilter({ albumRating: value })}
+                  className="flex justify-center md:flex-col md:items-start gap-2"
+                />
+              </section>
+            )}
           </div>
         </>
       )}
