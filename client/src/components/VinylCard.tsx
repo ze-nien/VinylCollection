@@ -4,8 +4,6 @@ import type { Vinyl } from "../types/vinyl.ts";
 import { useVinylStore } from "../store/vinylStore.ts";
 import { useAuthStore } from "../store/authStore.ts";
 import Modal from "./Modal.tsx";
-import { useLineClamp } from "../hooks/useLineClamp.ts";
-
 //複雜度
 const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
