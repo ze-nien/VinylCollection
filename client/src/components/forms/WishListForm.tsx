@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useBlocker } from "react-router";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { wishListSchema } from "../../types/wishList";
@@ -24,6 +24,7 @@ const WishListForm = () => {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isDirty, isSubmitSuccessful, isSubmitting },
   } = useForm<WishListBase>({
     resolver: zodResolver(wishListSchema),
@@ -51,7 +52,7 @@ const WishListForm = () => {
         },
     mode: "onChange",
   });
-
+  const watchNotes = useWatch({ control, name: "notes", defaultValue: "" });
   useEffect(() => {
     return () => clearListData();
   }, [clearListData]);
@@ -123,13 +124,14 @@ const WishListForm = () => {
       </div>
 
       <Modal
+        title="未儲存的變更"
         isOpen={blocker.state === "blocked"}
         cancelText="繼續編輯"
         onClose={() => blocker.reset?.()} //留在原地並解鎖攔截
         confirmText="放棄編輯"
         onConfirm={() => blocker.proceed?.()} //放行換頁
       >
-        <p>您輸入的願望清單資料尚未儲存，現在離開將會遺失所有填寫的進度。</p>
+        <p>您輸入的願望清單資料尚未儲存，離開將會遺失所有填寫的進度。</p>
       </Modal>
 
       <div
@@ -182,12 +184,17 @@ const WishListForm = () => {
               id="notes"
               label="Notes"
               tag="textarea"
-              maxLength={100}
               defaultValue={listData ? listData.notes : ""}
               error={errors.notes?.message as string}
               {...register("notes")}
             />
+            <p
+              className={`text-xs text-right text-gray-300 ${watchNotes && watchNotes.length > 100 ? "text-red-400" : null} `}
+            >
+              {watchNotes?.length} / 100
+            </p>
           </div>
+
           <div className="flex justify-center md:col-span-4 md:row-start-3 w-full">
             <button
               disabled={isSubmitting}

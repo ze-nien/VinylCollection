@@ -34,9 +34,9 @@ const Modal = ({
   return (
     <div className="z-10 fixed inset-0 flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/60 backdrop-blur-xs" />
-      <div className="relative w-full max-w-md p-6">
+      <div className="relative w-full max-w-lg p-6">
         <div className="flex items-center justify-between border-b pb-3">
-          <h3 className="text-xl font-bold">{title || "提示訊息"}</h3>
+          <h3 className="text-xl font-bold">{title || "Message"}</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-700 cursor-pointer"
@@ -44,7 +44,7 @@ const Modal = ({
             ✕
           </button>
         </div>
-        <div className="mt-4">{children}</div>
+        <div className="mt-4 whitespace-normal wrap-break-word">{children}</div>
         {/* 🎯 3. 底部的按鈕操作區（直接刻在 Modal 內部） */}
         <div className="mt-6 flex justify-end gap-3">
           {/* 取消 / 繼續填寫按鈕 */}

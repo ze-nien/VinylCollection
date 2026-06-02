@@ -31,6 +31,8 @@ export const checkVinylDuplicate = <
     return isNameMatch && !isMyself;
   });
 
+  console.log(inputAlbum, inputArtist, inputVersion);
+
   const matchedExtraList = extraList?.filter((item) => {
     const isNameMatch =
       item.album.trim().toLowerCase() === inputAlbum &&
@@ -38,8 +40,13 @@ export const checkVinylDuplicate = <
     return isNameMatch;
   });
 
+  console.log(matchedExtraList);
+
   //沒撞名安全放行
-  if (matchedList.length === 0 && matchedExtraList?.length === 0)
+  if (
+    matchedList.length === 0 &&
+    (matchedExtraList !== undefined ? matchedExtraList.length === 0 : true)
+  )
     return { type: "SAFE" as const };
 
   //名字相同 比對版本
@@ -57,6 +64,8 @@ export const checkVinylDuplicate = <
         item.artist.trim().toLowerCase() === inputArtist,
     ) || []),
   ];
+
+  console.log(allMatches);
 
   const matchedVersionItem = allMatches.find(
     (item) =>

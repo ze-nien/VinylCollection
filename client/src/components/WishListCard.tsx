@@ -71,11 +71,17 @@ const WishListCard = ({ data }: { data: WishList }) => {
         </div>
       </div>
       {/* 資料 */}
-      <div className="flex flex-col gap-1 h-40">
-        <h4 className="text-lg">{data.album}</h4>
-        <h5 className="text-sm">{data.artist}</h5>
-        <h6 className="text-xs">{data.year}</h6>
-        <h6 className="text-xs">Version: {data.version}</h6>
+      <div className="flex flex-col gap-1 h-40 w-100">
+        <h4 className="text-lg truncate" title={data.album}>
+          {data.album}
+        </h4>
+        <h5 className="text-sm truncate" title={data.artist}>
+          {data.artist}
+        </h5>
+        <h6 className="text-xs truncate">{data.year}</h6>
+        <h6 className="text-xs truncate" title={data.version}>
+          Version: {data.version}
+        </h6>
         <div>
           {data.notes?.trim() ? (
             <>
@@ -138,15 +144,18 @@ const WishListCard = ({ data }: { data: WishList }) => {
       )}
       <Modal
         isOpen={isDeleteOpen}
-        title="刪除"
+        title="Delete Wish Data"
         onClose={() => setIsDeleteOpen(false)}
-        cancelText="取消刪除"
+        cancelText="Cancel"
         onConfirm={() => deleteWishListData(data._id)}
-        confirmText="確定刪除"
+        confirmText="Delete"
       >
-        <p>
-          確定刪除 {data.artist} - {data.album} ?
-        </p>
+        <div className="mt-3 bg-secondary p-3 rounded-lg border border-neutral-800">
+          <p className="text-sm truncate">Artist: {data.artist}</p>
+          <p className="text-sm truncate mt-1">Album: {data.album}</p>
+          <p className="text-xs truncate mt-1">Year: {data.year}</p>
+          <p className="text-xs truncate mt-1">Version: {data.version}</p>
+        </div>
       </Modal>
     </div>
   );

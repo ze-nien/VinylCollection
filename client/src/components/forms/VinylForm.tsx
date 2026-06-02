@@ -111,13 +111,14 @@ const VinylForm = () => {
     <>
       {/*blocker是blocked時顯示 並且其狀態有reset與proceed兩個控制函式 */}
       <Modal
+        title="未儲存的變更"
         isOpen={blocker.state === "blocked"}
         cancelText="繼續編輯"
         onClose={() => blocker.reset?.()} //留在原地並解鎖攔截
         confirmText="放棄編輯"
         onConfirm={() => blocker.proceed?.()} //放行換頁
       >
-        <p>您輸入的黑膠唱片資料尚未儲存，現在離開將會遺失所有填寫的進度。</p>
+        <p>您輸入的黑膠唱片資料尚未儲存，離開將會遺失所有填寫的進度。</p>
       </Modal>
 
       <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
@@ -191,11 +192,12 @@ const VinylForm = () => {
               id="notes"
               label="Notes"
               tag="textarea"
-              maxLength={100}
               error={errors.notes?.message as string}
               {...register("notes")}
             />
-            <p className="text-xs text-right text-gray-300">
+            <p
+              className={`text-xs text-right text-gray-300 ${watchNotes && watchNotes.length > 100 ? "text-red-400" : null} `}
+            >
               {watchNotes?.length} / 100
             </p>
           </div>

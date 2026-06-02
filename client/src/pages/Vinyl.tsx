@@ -27,7 +27,7 @@ const Vinyl = () => {
           <div
             className="grid grid-cols-1 
           md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 
-          gap-8 justify-items-center"
+          gap-8 justify-items-center  items-start"
           >
             {vinyls.map((vinyl) => (
               <VinylCard key={vinyl._id} vinyl={vinyl} />

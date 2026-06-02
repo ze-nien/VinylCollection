@@ -4,14 +4,16 @@ import type { Vinyl } from "../types/vinyl.ts";
 import { useVinylStore } from "../store/vinylStore.ts";
 import { useAuthStore } from "../store/authStore.ts";
 import Modal from "./Modal.tsx";
+import { useLineClamp } from "../hooks/useLineClamp.ts";
 
 //複雜度
 const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
   const deleteVinyl = useVinylStore((s) => s.deleteVinyl);
-  const [showNotes, setShowNotes] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+
   return (
     <div className="flex flex-col w-70 md:w-50">
       {/* 圖 */}
@@ -30,7 +32,7 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
           <div>
             <button
               onClick={() => setShowNotes(!showNotes)}
-              className="absolute top-1 right-1 z-20
+              className="absolute top-1 right-1 z-5
                bg-black/30 text-gray-300/80
                 hover:bg-black/70 hover:text-gray-200 transition
                  rounded-full size-5
@@ -58,10 +60,17 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
         )}
       </div>
       {/* 資訊 */}
-      <h3 className="text-xl">{vinyl.album}</h3>
-      <h4 className="text-lg">{vinyl.artist}</h4>
+      <h3 className="text-xl truncate" title={vinyl.artist}>
+        {vinyl.artist}
+      </h3>
+      <h4 className="text-lg truncate" title={vinyl.album}>
+        {vinyl.album}
+      </h4>
       <h5 className="text-sm">{vinyl.year}</h5>
-      <h6 className="text-xs">{`Version: ${vinyl.version}`}</h6>
+      <h6 className="text-xs truncate" title={vinyl.version}>
+        {`Version: ${vinyl.version}`}
+      </h6>
+
       {/* 評分 */}
       <div className="flex items-center text-primary">
         <span className="text-sm text-white mr-1">Rating:</span>
@@ -107,15 +116,19 @@ const VinylCard = ({ vinyl }: { vinyl: Vinyl }) => {
       {/* 確認刪除 */}
       <Modal
         isOpen={isDeleteOpen}
-        title="刪除"
+        title="刪除黑膠資料"
         onClose={() => setIsDeleteOpen(false)}
         cancelText="取消刪除"
         onConfirm={() => deleteVinyl(vinyl._id)}
         confirmText="確定刪除"
       >
-        <p>
-          確定刪除 {vinyl.artist} - {vinyl.album} ?
-        </p>
+        <div className="mt-3 bg-secondary p-3 rounded-lg border border-neutral-800">
+          <p className="text-lg truncate">確定永久刪除此黑膠唱片?</p>
+          <p className="text-sm truncate">Artist: {vinyl.artist}</p>
+          <p className="text-sm truncate mt-1">Album: {vinyl.album}</p>
+          <p className="text-xs truncate mt-1">Year: {vinyl.year}</p>
+          <p className="text-xs truncate mt-1">Version: {vinyl.version}</p>
+        </div>
       </Modal>
     </div>
   );
